@@ -163,7 +163,11 @@ JSON
 drone-pothole-detection/
 ├── backend/
 │   └── API/
-│       ├── main.py          # Primary FastAPI server, detection pipeline & endpoints
-│       └── static/          # Output directory for rendered annotated images
-├── .gitignore               # Excludes pycache, temporary files, & static uploads
-└── README.md                # System documentation
+│       └── main.py              # Core FastAPI & Computer Vision engine
+├── tests/
+│   └── sample_images/           # Archived raw test photos & proof for future reference
+│       ├── bf63101a995...jpg
+│       ├── p1.webp
+│       └── potholes.jpg
+├── .gitignore
+└── README.md                    # Complete project documentation
