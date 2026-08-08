@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚁 Drone Pothole Inspection Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- FontAwesome Icons for clean UI accents -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+        <div class="brand">
+            <i class="fa-solid fa-helicopter"></i>
+            <h2>AERO<span>INSPECT</span></h2>
+        </div>
+        <div class="badge-status">
+            <span class="status-dot"></span> System Ready
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-layout">
+        
+        <!-- Left Panel: Dropzone & File Queue -->
+        <section class="control-panel">
+            <div class="card upload-card">
+                <h3><i class="fa-solid fa-cloud-arrow-up"></i> Upload Drone Images</h3>
+                <p>Drag & drop up to 50 inspection images or a mission folder.</p>
+                
+                <div class="dropzone" id="dropzone">
+                    <i class="fa-solid fa-folder-open drop-icon"></i>
+                    <p id="dropText">Drag photos here or <span>Browse</span></p>
+                    <input type="file" id="folderInput" multiple accept="image/*">
+                </div>
+                
+                <button id="btnRun" class="btn-primary" disabled>
+                    <i class="fa-solid fa-bolt"></i> Run Batch AI Inspection
+                </button>
+            </div>
+
+            <!-- Sidebar File List -->
+            <div class="card queue-card hidden" id="queueContainer">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-list-check"></i> Inspection Queue</h3>
+                    <span id="queueCount" class="count-pill">0</span>
+                </div>
+                <div class="file-list" id="fileList"></div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Canvas & Analytics -->
+        <section class="display-panel">
+            
+            <!-- Empty State Prompt -->
+            <div class="card empty-state" id="emptyState">
+                <i class="fa-solid fa-layer-group"></i>
+                <h3>No Active Inspection Batch</h3>
+                <p>Upload drone imagery on the left panel to begin automated defect detection and analytical mapping.</p>
+            </div>
+
+            <!-- Workspace View -->
+            <div class="card workspace-card hidden" id="workspace">
+                <!-- Metrics Bar -->
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <span class="metric-title"><i class="fa-solid fa-file-image"></i> Active Image</span>
+                        <h4 id="activeFilename">-</h4>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title"><i class="fa-solid fa-triangle-exclamation"></i> Defects Detected</span>
+                        <h4 id="activeDefects" class="highlight-blue">0</h4>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title"><i class="fa-solid fa-gauge-high"></i> Severity Level</span>
+                        <h4 id="activeSeverity" class="highlight-yellow">-</h4>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title"><i class="fa-solid fa-clipboard-check"></i> Priority Action</span>
+                        <h4 id="activePriority">-</h4>
+                    </div>
+                </div>
+
+                <!-- Canvas Viewer -->
+                <div class="canvas-viewport">
+                    <canvas id="photoCanvas"></canvas>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
