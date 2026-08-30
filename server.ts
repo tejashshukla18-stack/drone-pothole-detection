@@ -1976,7 +1976,7 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 });
 
 // Static files & SPA routing
-const frontendPath = path.join(process.cwd(), 'frontend');
+const frontendPath = path.join(process.cwd(), 'frontend-react', 'dist');
 app.use(express.static(frontendPath));
 app.use('/dataset', express.static(path.join(process.cwd(), 'dataset')));
 app.use('/static', express.static(path.join(process.cwd(), 'static')));
