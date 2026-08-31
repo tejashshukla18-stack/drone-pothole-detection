@@ -38,6 +38,20 @@ export const NAV_ITEMS = [
     subtitle:
       'Unified mission control for fleet status, AI review, and work order dispatch',
   },
+  {
+    path: '/reports',
+    label: 'Reports',
+    icon: 'fa-solid fa-file-pdf',
+    title: 'Municipal Pavement Inspection Reports',
+    subtitle: 'Certified civil engineering dossiers and compliance documentation',
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: 'fa-solid fa-gear',
+    title: 'System Settings',
+    subtitle: 'Department credentials, AI sensitivity, and authorized user access',
+  },
 ]
 
 export function getNavItemByPath(pathname) {

@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { getNavItemByPath } from '../../config/navigation.js'
+import NotificationDrawer from './NotificationDrawer.jsx'
 
 export default function TopHeader({ onMenuToggle }) {
   const location = useLocation()
@@ -37,16 +38,7 @@ export default function TopHeader({ onMenuToggle }) {
           <span>RTK GPS Fixed (0.8cm)</span>
         </div>
 
-        <button
-          type="button"
-          title="Notifications"
-          className="relative inline-flex items-center gap-2 rounded-sm border border-border bg-bg-card px-3 py-2 text-[13px] font-semibold text-text-primary transition-colors hover:bg-bg-card-hover"
-        >
-          <i className="fa-solid fa-bell" />
-          <span className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-p1 text-[10px] font-bold text-white">
-            2
-          </span>
-        </button>
+        <NotificationDrawer />
 
         <button
           type="button"
