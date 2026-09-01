@@ -3,11 +3,13 @@ import { fetchSettings } from '../api/settings.js'
 import Spinner from '../components/ui/Spinner.jsx'
 import ErrorState from '../components/ui/ErrorState.jsx'
 import DepartmentSettingsForm from '../components/settings/DepartmentSettingsForm.jsx'
+import EscalationSettingsForm from '../components/settings/EscalationSettingsForm.jsx'
 import UsersList from '../components/settings/UsersList.jsx'
 
 export default function Settings() {
   const [status, setStatus] = useState('loading') // loading | success | error
   const [settings, setSettings] = useState({})
+  const [escalationSettings, setEscalationSettings] = useState({})
   const [users, setUsers] = useState([])
 
   const load = useCallback(async () => {
@@ -15,6 +17,7 @@ export default function Settings() {
     try {
       const data = await fetchSettings()
       setSettings(data.settings || {})
+      setEscalationSettings(data.escalation_settings || {})
       setUsers(data.users || [])
       setStatus('success')
     } catch (err) {
@@ -54,6 +57,18 @@ export default function Settings() {
           </p>
         </div>
         <DepartmentSettingsForm settings={settings} />
+      </div>
+
+      <div className="rounded-md border border-border bg-bg-card p-4 shadow-card-sm">
+        <div className="mb-4">
+          <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
+            <i className="fa-solid fa-file-shield text-accent-blue" /> Issue Escalation
+          </h3>
+          <p className="mt-0.5 text-[12px] text-text-muted">
+            Auto-escalation, default SLA, and notification channel configuration
+          </p>
+        </div>
+        <EscalationSettingsForm settings={escalationSettings} />
       </div>
 
       <div className="rounded-md border border-border bg-bg-card p-4 shadow-card-sm">

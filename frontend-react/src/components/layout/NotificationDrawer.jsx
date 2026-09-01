@@ -9,6 +9,7 @@ const TYPE_ICON = {
   inspection: 'fa-solid fa-satellite-dish',
   asset: 'fa-solid fa-road-barrier',
   system: 'fa-solid fa-gear',
+  escalation: 'fa-solid fa-triangle-exclamation',
 }
 
 const TYPE_TONE = {
@@ -17,6 +18,7 @@ const TYPE_TONE = {
   inspection: 'text-accent-teal bg-accent-teal/10',
   asset: 'text-p1 bg-p1/10',
   system: 'text-text-muted bg-bg-card-hover',
+  escalation: 'text-p1 bg-p1/10',
 }
 
 export default function NotificationDrawer() {

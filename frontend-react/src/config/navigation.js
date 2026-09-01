@@ -30,6 +30,15 @@ export const NAV_ITEMS = [
       'Upload high-resolution aerial imagery and execute computer vision detection',
   },
   {
+    path: '/land-intelligence',
+    label: 'Land Intelligence',
+    icon: 'fa-solid fa-draw-polygon',
+    badge: { text: 'NEW', tone: 'default' },
+    title: 'Land Encroachment Intelligence',
+    subtitle:
+      'AI-powered parcel boundary analysis, structure detection and encroachment risk assessment',
+  },
+  {
     path: '/command-centre',
     label: 'Command Centre',
     icon: 'fa-solid fa-satellite',
@@ -37,6 +46,14 @@ export const NAV_ITEMS = [
     title: 'Command Centre',
     subtitle:
       'Unified mission control for fleet status, AI review, and work order dispatch',
+  },
+  {
+    path: '/issue-escalation',
+    label: 'Issue Escalation',
+    icon: 'fa-solid fa-file-shield',
+    title: 'Automatic Issue Escalation',
+    subtitle:
+      'Critical detections routed and ticketed automatically to the responsible authority',
   },
   {
     path: '/reports',

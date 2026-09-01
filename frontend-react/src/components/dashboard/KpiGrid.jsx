@@ -1,36 +1,37 @@
 const ICON_TONES = {
-  blue: 'bg-accent-blue/15 text-accent-blue',
-  teal: 'bg-accent-teal/15 text-accent-teal',
-  red: 'bg-p1/15 text-p1',
-  green: 'bg-p3/15 text-p3',
+  blue: 'bg-slate-100 text-slate-500',
+  teal: 'bg-slate-100 text-slate-500',
+  red: 'bg-slate-100 text-slate-500',
+  green: 'bg-slate-100 text-slate-500',
 }
 
-const TREND_TONES = {
-  positive: 'text-p3',
-  neutral: 'text-accent-teal',
-  negative: 'text-p1',
-}
-
-function KpiCard({ icon, tone, label, value, unit, trendIcon, trendTone, trendLabel, alert }) {
+function KpiCard({ icon, tone, label, value, unit, alert, illustration, illustrationAlt }) {
   return (
     <div
-      className={`flex items-center gap-3.5 rounded-md border bg-bg-card p-4 shadow-card-sm transition-transform hover:-translate-y-0.5 hover:border-border-light ${
+      className={`relative flex h-[150px] flex-col overflow-hidden rounded-md border bg-bg-card p-4 shadow-card-sm transition-transform hover:-translate-y-0.5 hover:border-border-light ${
         alert ? 'border-p1/30' : 'border-border'
       }`}
     >
-      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-lg ${ICON_TONES[tone]}`}>
-        <i className={`fa-solid ${icon}`} />
+      <div className="relative z-10 flex items-center gap-2">
+        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[13px] ${ICON_TONES[tone]}`}>
+          <i className={`fa-solid ${icon}`} />
+        </div>
+        <span className="text-[12.5px] font-semibold text-text-muted">{label}</span>
       </div>
-      <div className="flex flex-col">
-        <span className="text-xs font-medium text-text-muted">{label}</span>
-        <h3 className={`my-0.5 text-2xl font-bold ${alert ? 'text-p1' : 'text-text-primary'}`}>
-          {value}
-          {unit && <span className="ml-0.5 text-sm font-normal text-text-muted">{unit}</span>}
-        </h3>
-        <span className={`flex items-center gap-1 text-[11px] font-semibold ${TREND_TONES[trendTone]}`}>
-          <i className={`fa-solid ${trendIcon}`} /> {trendLabel}
-        </span>
-      </div>
+
+      <h3 className={`relative z-10 mt-3 text-[26px] font-bold leading-none ${alert ? 'text-p1' : 'text-text-primary'}`}>
+        {value}
+        {unit && <span className="ml-0.5 text-sm font-normal text-text-muted">{unit}</span>}
+      </h3>
+
+      {illustration && (
+        <img
+          src={illustration}
+          alt={illustrationAlt || ''}
+          aria-hidden={!illustrationAlt}
+          className="pointer-events-none absolute -bottom-3 -right-4 h-[128px] w-[176px] object-contain opacity-95"
+        />
+      )}
     </div>
   )
 }
@@ -39,32 +40,26 @@ export default function KpiGrid({ kpis }) {
   return (
     <div className="mb-4.5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       <KpiCard
-        icon="fa-road"
+        icon="fa-binoculars"
         tone="blue"
         label="Total Managed Assets"
         value={kpis.total_assets}
-        trendIcon="fa-arrow-up"
-        trendTone="positive"
-        trendLabel="Municipal road network"
+        illustration="/kpi-road.svg"
       />
       <KpiCard
-        icon="fa-drone"
+        icon="fa-clipboard-list"
         tone="teal"
         label="Completed Inspections"
         value={kpis.total_inspections}
-        trendIcon="fa-check"
-        trendTone="neutral"
-        trendLabel="100% telemetry synced"
+        illustration="/kpi-drone.svg"
       />
       <KpiCard
         icon="fa-triangle-exclamation"
         tone="red"
         label="Critical Defects (P1)"
         value={kpis.critical_defects}
-        trendIcon="fa-bolt"
-        trendTone="negative"
-        trendLabel="Immediate repair needed"
         alert
+        illustration="/kpi-crack.svg"
       />
       <KpiCard
         icon="fa-heart-pulse"
@@ -72,9 +67,7 @@ export default function KpiGrid({ kpis }) {
         label="Infrastructure Health"
         value={kpis.health_score}
         unit="/100"
-        trendIcon="fa-circle-check"
-        trendTone="positive"
-        trendLabel="Municipal fair tier"
+        illustration="/kpi-health.svg"
       />
     </div>
   )

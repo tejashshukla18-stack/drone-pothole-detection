@@ -226,6 +226,41 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
             </table>
           </div>
         </section>
+        <section>
+          <h4 className="mb-1.5 text-[13px] font-bold">
+            5. Issue Escalation &amp; Ticketing
+          </h4>
+          {(report.escalation_tickets || []).length === 0 ? (
+            <p className="text-[12px] text-text-muted">No escalation tickets are currently linked to this asset.</p>
+          ) : (
+            <div className="overflow-x-auto rounded-sm border border-border">
+              <table className="w-full min-w-[560px] text-left text-[12px]">
+                <thead className="bg-bg-surface text-text-muted">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">Ticket ID</th>
+                    <th className="px-3 py-2 font-semibold">Issue</th>
+                    <th className="px-3 py-2 font-semibold">Severity</th>
+                    <th className="px-3 py-2 font-semibold">Authority</th>
+                    <th className="px-3 py-2 font-semibold">Status</th>
+                    <th className="px-3 py-2 font-semibold">Maintenance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {report.escalation_tickets.map((t) => (
+                    <tr key={t.ticketId}>
+                      <td className="px-3 py-2 font-mono font-bold text-accent-blue">{t.ticketId}</td>
+                      <td className="px-3 py-2">{t.issueType}</td>
+                      <td className="px-3 py-2">{t.severity}</td>
+                      <td className="px-3 py-2">{t.authorityName}</td>
+                      <td className="px-3 py-2">{t.status}</td>
+                      <td className="px-3 py-2 font-mono text-text-muted">{t.workOrderId || '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   )

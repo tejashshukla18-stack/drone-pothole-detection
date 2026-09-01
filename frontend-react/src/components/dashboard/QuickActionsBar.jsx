@@ -13,7 +13,7 @@ export default function QuickActionsBar({
       <button
         type="button"
         onClick={onStartInspection}
-        className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-bg-card px-3.5 py-2 text-[13px] font-medium text-text-primary transition-colors hover:border-accent-blue hover:bg-accent-blue hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-sm bg-[#0f172a] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#1e293b]"
       >
         <i className="fa-solid fa-satellite" /> Start Drone Mission
       </button>
@@ -21,7 +21,7 @@ export default function QuickActionsBar({
       <button
         type="button"
         onClick={onLoadSample}
-        className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-bg-card px-3.5 py-2 text-[13px] font-medium text-text-primary transition-colors hover:border-accent-blue hover:bg-accent-blue hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-sm bg-[#0f172a] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#1e293b]"
       >
         <i className="fa-solid fa-folder-open" /> 1-Click Load Sample Dataset
       </button>
@@ -29,7 +29,7 @@ export default function QuickActionsBar({
       <button
         type="button"
         onClick={onRegisterAsset}
-        className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-bg-card px-3.5 py-2 text-[13px] font-medium text-text-primary transition-colors hover:border-accent-blue hover:bg-accent-blue hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-sm bg-[#0f172a] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#1e293b]"
       >
         <i className="fa-solid fa-plus" /> Register Asset
       </button>
@@ -37,7 +37,7 @@ export default function QuickActionsBar({
       <button
         type="button"
         onClick={onDispatchWorkOrder}
-        className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-bg-card px-3.5 py-2 text-[13px] font-medium text-text-primary transition-colors hover:border-accent-blue hover:bg-accent-blue hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-sm bg-[#0f172a] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#1e293b]"
       >
         <i className="fa-solid fa-helmet-safety" /> Dispatch Work Order
       </button>

@@ -4,6 +4,15 @@ function formatFileSize(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`
 }
 
+const PIPELINE_STAGES = ['Upload', 'Detect', 'Classify']
+
+function stageIndexForPercent(percent) {
+  if (percent >= 100) return 3
+  if (percent >= 70) return 2
+  if (percent >= 30) return 1
+  return 0
+}
+
 export default function UploadPanel({
   assets,
   targetAssetId,
@@ -23,22 +32,29 @@ export default function UploadPanel({
     onFilesSelected(files)
   }
 
+  const totalQueueBytes = selectedFiles.reduce((sum, f) => sum + f.size, 0)
+  const activeStage = progress ? stageIndexForPercent(progress.percent) : -1
+
   return (
     <div className="flex flex-col gap-4">
-      {/* Upload Card */}
+      {/* Ingestion Console */}
       <div className="rounded-md border border-border bg-bg-card p-5 shadow-card-sm">
-        <div className="mb-4">
-          <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-            <i className="fa-solid fa-cloud-arrow-up text-accent-blue" /> Upload Drone Imagery
-          </h3>
-          <p className="mt-0.5 text-xs text-text-muted">
-            Drop high-res aerial photos or mission survey folders
-          </p>
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
+              <i className="fa-solid fa-cloud-arrow-up text-accent-blue" /> Mission Ingestion
+            </h3>
+            <p className="mt-0.5 text-xs text-text-muted">Drop high-res aerial frames for CV analysis</p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-accent-teal/25 bg-accent-teal/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-teal">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent-teal" />
+            CV Engine Online
+          </span>
         </div>
 
         <div className="mb-4 flex flex-col gap-1.5">
           <label htmlFor="selectMissionAsset" className="text-xs font-semibold text-text-secondary">
-            <i className="fa-solid fa-map-pin" /> Target Asset:
+            <i className="fa-solid fa-location-dot text-text-muted" /> Target Asset
           </label>
           <select
             id="selectMissionAsset"
@@ -46,7 +62,7 @@ export default function UploadPanel({
             onChange={(e) => onTargetAssetChange(e.target.value)}
             className="w-full rounded-sm border border-border bg-bg-input px-3 py-2 text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
           >
-            <option value="">Select Asset to Inspect...</option>
+            <option value="">Select asset to inspect...</option>
             {assets.map((asset) => (
               <option key={asset.id} value={asset.id}>
                 {asset.name} ({asset.code})
@@ -55,6 +71,8 @@ export default function UploadPanel({
           </select>
         </div>
 
+        {/* Viewfinder dropzone: corner brackets + faint survey grid, echoing an
+            aerial capture frame rather than a generic dashed upload box. */}
         <div
           role="button"
           tabIndex={0}
@@ -72,17 +90,31 @@ export default function UploadPanel({
             setDragOver(false)
             if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files)
           }}
-          className={`flex cursor-pointer flex-col items-center gap-1.5 rounded-md border-2 border-dashed px-4 py-8 text-center transition-colors ${
-            isDragOver
-              ? 'border-accent-blue bg-accent-blue/5'
-              : 'border-border-light bg-bg-input hover:border-accent-blue/50'
+          style={{ backgroundImage: 'url(/map-pattern.svg)', backgroundSize: '120px 120px' }}
+          className={`relative flex cursor-pointer flex-col items-center gap-1.5 rounded-md border px-4 py-9 text-center transition-colors ${
+            isDragOver ? 'border-accent-blue bg-accent-blue/5' : 'border-border bg-bg-input/60 hover:bg-bg-input'
           }`}
         >
+          {/* corner reticle marks */}
+          {[
+            'left-2 top-2 border-l-2 border-t-2',
+            'right-2 top-2 border-r-2 border-t-2',
+            'left-2 bottom-2 border-l-2 border-b-2',
+            'right-2 bottom-2 border-r-2 border-b-2',
+          ].map((pos) => (
+            <span
+              key={pos}
+              className={`pointer-events-none absolute h-4 w-4 rounded-[2px] ${pos} ${
+                isDragOver ? 'border-accent-blue' : 'border-border-light'
+              }`}
+            />
+          ))}
+
           <i className="fa-solid fa-helicopter mb-1 text-3xl text-accent-blue/70" />
           <h4 className="text-sm font-bold text-text-primary">Drag &amp; drop drone photos here</h4>
-          <p className="text-xs text-text-muted">Supports JPG, PNG up to 50MB per frame (Max 50 images)</p>
+          <p className="text-xs text-text-muted">JPG, PNG up to 50MB per frame &middot; max 50 images</p>
           <span className="text-xs font-semibold text-accent-blue underline underline-offset-2">
-            or Browse Local Files
+            or browse local files
           </span>
           <input
             ref={fileInputRef}
@@ -98,24 +130,24 @@ export default function UploadPanel({
         </div>
 
         <div className="mt-4 flex items-center gap-2 text-xs text-text-muted">
-          <span>Fast Testing:</span>
+          <span>Fast testing:</span>
           <button
             type="button"
             onClick={onLoadSampleDataset}
             disabled={isProcessing}
             className="inline-flex items-center gap-2 rounded-full border border-accent-teal/30 bg-accent-teal/10 px-3 py-1.5 text-xs font-semibold text-accent-teal transition-colors hover:bg-accent-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <i className="fa-solid fa-images" /> Load 6 Flight Sample Frames
+            <i className="fa-solid fa-images" /> Load 6 flight sample frames
           </button>
         </div>
 
         {progress && (
-          <div className="mt-4 flex flex-col gap-2 rounded-sm border border-border bg-bg-input p-3">
+          <div className="mt-4 flex flex-col gap-3 rounded-sm border border-border bg-bg-input p-3">
             <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
               <span className="flex items-center gap-1.5">
                 <i className="fa-solid fa-gear fa-spin text-accent-blue" /> {progress.label}
               </span>
-              <span>{progress.percent}%</span>
+              <span className="font-mono">{progress.percent}%</span>
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
               <div
@@ -123,14 +155,38 @@ export default function UploadPanel({
                 style={{ width: `${progress.percent}%` }}
               />
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {['CLAHE Grayscale', 'Cavity BFS', 'Solidity Filter', 'NMS IoU'].map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full bg-accent-blue/10 px-2 py-0.5 text-[10px] font-semibold text-accent-blue"
-                >
-                  {tag}
-                </span>
+
+            {/* Pipeline stepper: this genuinely is a sequence (upload -> detect
+                -> classify), so numbering/ordering here is informative. */}
+            <div className="flex items-center">
+              {PIPELINE_STAGES.map((stage, idx) => (
+                <div key={stage} className="flex flex-1 items-center last:flex-initial">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
+                        idx < activeStage
+                          ? 'bg-accent-blue text-white'
+                          : idx === activeStage
+                            ? 'bg-accent-blue/15 text-accent-blue ring-2 ring-accent-blue/30'
+                            : 'bg-border text-text-muted'
+                      }`}
+                    >
+                      {idx < activeStage ? <i className="fa-solid fa-check text-[9px]" /> : idx + 1}
+                    </span>
+                    <span
+                      className={`text-[11px] font-semibold ${
+                        idx <= activeStage ? 'text-text-primary' : 'text-text-muted'
+                      }`}
+                    >
+                      {stage}
+                    </span>
+                  </div>
+                  {idx < PIPELINE_STAGES.length - 1 && (
+                    <div
+                      className={`mx-2 h-px flex-1 ${idx < activeStage ? 'bg-accent-blue' : 'bg-border'}`}
+                    />
+                  )}
+                </div>
               ))}
             </div>
           </div>
@@ -142,46 +198,53 @@ export default function UploadPanel({
           disabled={selectedFiles.length === 0 || isProcessing}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-accent-blue px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-accent-blue-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isProcessing ? (
-            <i className="fa-solid fa-spinner fa-spin" />
-          ) : (
-            <i className="fa-solid fa-bolt" />
-          )}
+          {isProcessing ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-bolt" />}
           Run Computer Vision Inspection
         </button>
       </div>
 
-      {/* Inspection Queue */}
+      {/* Manifest */}
       <div className="rounded-md border border-border bg-bg-card p-5 shadow-card-sm">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-            <i className="fa-solid fa-list-check text-accent-blue" /> Image Processing Queue
+            <i className="fa-solid fa-list-check text-accent-blue" /> Frame Manifest
           </h3>
-          <span className="rounded-full bg-border px-2.5 py-1 text-[11px] font-bold text-text-secondary">
-            {selectedFiles.length > 0 ? `${selectedFiles.length} frames queued` : '0 frames'}
+          <span className="rounded-full bg-border px-2.5 py-1 font-mono text-[11px] font-bold text-text-secondary">
+            {selectedFiles.length} queued
           </span>
         </div>
 
         {selectedFiles.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-center text-text-muted">
             <i className="fa-solid fa-images text-2xl opacity-50" />
-            <p className="text-xs">No images selected. Upload files or load sample mission.</p>
+            <p className="text-xs">No frames queued. Upload files or load a sample mission.</p>
           </div>
         ) : (
-          <div className="flex max-h-64 flex-col gap-1.5 overflow-y-auto">
-            {selectedFiles.map((file, idx) => (
-              <div
-                key={`${file.name}-${idx}`}
-                className="flex items-center justify-between rounded-sm bg-bg-input px-3 py-2 text-xs"
-              >
-                <span className="flex min-w-0 items-center gap-2 truncate font-medium text-text-primary">
-                  <i className="fa-solid fa-image text-accent-blue" />
-                  <span className="truncate">{file.name}</span>
-                </span>
-                <span className="shrink-0 text-[11px] text-text-muted">{formatFileSize(file.size)}</span>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="flex max-h-64 flex-col gap-1.5 overflow-y-auto">
+              {selectedFiles.map((file, idx) => (
+                <div
+                  key={`${file.name}-${idx}`}
+                  className="flex items-center gap-2.5 rounded-sm bg-bg-input px-3 py-2 text-xs"
+                >
+                  <span className="w-5 shrink-0 text-right font-mono text-[10px] text-text-muted">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
+                  <i className="fa-solid fa-image shrink-0 text-accent-blue" />
+                  <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{file.name}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-text-muted">
+                    {formatFileSize(file.size)}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-2.5 flex items-center justify-between border-t border-border pt-2.5 text-[11px] text-text-muted">
+              <span>Total payload</span>
+              <span className="font-mono font-semibold text-text-secondary">
+                {formatFileSize(totalQueueBytes)}
+              </span>
+            </div>
+          </>
         )}
       </div>
     </div>

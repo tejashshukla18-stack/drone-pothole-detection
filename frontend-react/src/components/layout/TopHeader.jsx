@@ -33,7 +33,7 @@ export default function TopHeader({ onMenuToggle }) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2 md:gap-3.5">
-        <div className="hidden items-center gap-2 rounded-full border border-accent-teal/30 bg-accent-teal/10 px-3 py-1.5 text-xs font-semibold text-accent-teal lg:flex">
+        <div className="hidden items-center gap-2 rounded-full border border-accent-teal/25 bg-accent-teal/10 px-3 py-1.5 text-[12px] font-semibold text-accent-teal lg:flex">
           <i className="fa-solid fa-tower-broadcast" />
           <span>RTK GPS Fixed (0.8cm)</span>
         </div>
@@ -43,7 +43,7 @@ export default function TopHeader({ onMenuToggle }) {
         <button
           type="button"
           onClick={() => navigate('/inspections')}
-          className="inline-flex items-center gap-2 whitespace-nowrap rounded-sm bg-accent-blue px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-accent-blue-hover"
+          className="inline-flex items-center gap-2 whitespace-nowrap rounded-sm bg-[#0f172a] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#1e293b]"
         >
           <i className="fa-solid fa-plus" />
           <span className="hidden sm:inline">New Inspection</span>

@@ -6,8 +6,15 @@ import CreateMissionModal from '../components/inspections/CreateMissionModal.jsx
 import ReviewWorkbench from '../components/inspections/review/ReviewWorkbench.jsx'
 import { fetchAssets } from '../api/assets.js'
 import { fetchMissions, inspectBatch, inspectSample } from '../api/inspections.js'
-import { SAMPLE_DATASET_FILENAMES } from '../components/inspections/inspectionHelpers.js'
+import { SAMPLE_DATASET_FILENAMES, getFleetStats } from '../components/inspections/inspectionHelpers.js'
 import { useToast } from '../context/ToastContext.jsx'
+
+const STAT_TILES = [
+  { key: 'totalMissions', label: 'Missions Logged', icon: 'fa-clipboard-list', tone: 'text-text-primary' },
+  { key: 'totalFrames', label: 'Frames Analyzed', icon: 'fa-images', tone: 'text-text-primary' },
+  { key: 'totalDefects', label: 'Defects Found', icon: 'fa-triangle-exclamation', tone: 'text-p2' },
+  { key: 'highSeverityCount', label: 'High Severity', icon: 'fa-circle-exclamation', tone: 'text-p1' },
+]
 
 export default function Inspections() {
   const { showToast } = useToast()
@@ -156,8 +163,30 @@ export default function Inspections() {
     )
   }
 
+  const fleetStats = getFleetStats(missions)
+
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[380px_1fr]">
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {STAT_TILES.map((tile) => (
+          <div
+            key={tile.key}
+            className="flex items-center gap-3 rounded-md border border-border bg-bg-card px-4 py-3 shadow-card-sm"
+          >
+            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-sm bg-bg-input text-sm ${tile.tone}`}>
+              <i className={`fa-solid ${tile.icon}`} />
+            </span>
+            <div className="min-w-0">
+              <div className={`font-mono text-lg font-bold leading-none ${tile.tone}`}>
+                {fleetStats[tile.key]}
+              </div>
+              <div className="mt-1 truncate text-[11px] font-medium text-text-muted">{tile.label}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[380px_1fr]">
       <UploadPanel
         assets={assets}
         targetAssetId={targetAssetId}
@@ -177,7 +206,7 @@ export default function Inspections() {
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-              <i className="fa-solid fa-clipboard-list text-accent-blue" /> Drone Inspection Missions
+              <i className="fa-solid fa-satellite-dish text-accent-blue" /> Survey Log
             </h3>
             <p className="mt-0.5 text-xs text-text-muted">
               Comprehensive logs of autonomous aerial pavement surveys
@@ -199,6 +228,7 @@ export default function Inspections() {
           onReview={openReview}
           onCreateMission={() => setCreateMissionOpen(true)}
         />
+      </div>
       </div>
 
       <CreateMissionModal

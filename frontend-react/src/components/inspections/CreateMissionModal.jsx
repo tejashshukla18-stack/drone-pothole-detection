@@ -126,6 +126,7 @@ export default function CreateMissionModal({ isOpen, onClose, assets, defaultAss
             label="Flight Altitude (m AGL)"
             type="number"
             step="any"
+            className="[&_input]:font-mono"
             value={form.altitude}
             onChange={(e) => updateField('altitude', e.target.value)}
           />

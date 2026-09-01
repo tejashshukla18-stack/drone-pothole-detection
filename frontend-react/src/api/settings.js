@@ -40,3 +40,21 @@ export async function saveSettings(payload) {
   }
   return data.settings
 }
+
+/**
+ * POST /api/settings/escalation
+ * Body: { auto_escalation_enabled?, critical_issue_auto_ticket?, default_sla_hours?, notification_channels?, authority_routing_rules? }
+ * Returns { status: 'success', escalation_settings }
+ */
+export async function saveEscalationSettings(payload) {
+  const res = await fetch('/api/settings/escalation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  const data = await parseJsonSafely(res)
+  if (!res.ok || !data?.escalation_settings) {
+    throw new Error(data?.error || 'Failed to save escalation settings.')
+  }
+  return data.escalation_settings
+}

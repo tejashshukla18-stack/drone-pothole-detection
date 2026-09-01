@@ -29,6 +29,18 @@
   --color-accent-teal: #0d9488;
   --color-accent-indigo: #4f46e5;
 
+  /* Sidebar (dark) */
+  --color-sidebar-bg: #12161f;
+  --color-sidebar-bg-hover: #1b202c;
+  --color-sidebar-border: #232838;
+  --color-sidebar-text: #e2e8f0;
+  --color-sidebar-text-muted: #6b7280;
+  --color-sidebar-active-bg: #1c2534;
+
+  /* Dark ink buttons (e.g. "+ New Inspection", quick actions) */
+  --color-ink: #0f172a;
+  --color-ink-hover: #1e293b;
+
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;

@@ -71,3 +71,21 @@ export function getOperatingThreshold(sensitivity) {
   if (sensitivity === 'precision') return 0.9
   return 0.3
 }
+
+export const SEVERITY_DOT_CLASSES = {
+  High: 'bg-p1',
+  Medium: 'bg-p2',
+  Low: 'bg-p3',
+}
+
+// Rolls the mission log up into a small set of fleet-level numbers for the
+// stats strip at the top of the Inspections page.
+export function getFleetStats(missions) {
+  const list = Array.isArray(missions) ? missions : []
+  return {
+    totalMissions: list.length,
+    totalFrames: list.reduce((sum, m) => sum + (m.total_images || 0), 0),
+    totalDefects: list.reduce((sum, m) => sum + (m.defects_found || 0), 0),
+    highSeverityCount: list.filter((m) => m.severity === 'High').length,
+  }
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import KpiGrid from '../components/dashboard/KpiGrid.jsx'
+import EscalationKpiStrip from '../components/dashboard/EscalationKpiStrip.jsx'
 import QuickActionsBar from '../components/dashboard/QuickActionsBar.jsx'
 import DashboardMap from '../components/dashboard/DashboardMap.jsx'
 import RecentActivity from '../components/dashboard/RecentActivity.jsx'
@@ -8,7 +9,7 @@ import RegisterAssetModal from '../components/assets/RegisterAssetModal.jsx'
 import CreateWorkOrderModal from '../components/inspections/review/CreateWorkOrderModal.jsx'
 import Spinner from '../components/ui/Spinner.jsx'
 import ErrorState from '../components/ui/ErrorState.jsx'
-import EmptyState from '../components/ui/EmptyState.jsx'
+import DashboardEmptyPanel from '../components/dashboard/DashboardEmptyPanel.jsx'
 import { fetchDashboardOverview } from '../api/dashboard.js'
 
 export default function Dashboard() {
@@ -54,10 +55,16 @@ export default function Dashboard() {
   const assets = overview?.assets || []
   const activities = overview?.recent_activity || []
   const hasAnyData = assets.length > 0 || activities.length > 0 || (kpis.total_assets || 0) > 0
+  const hasEscalationData =
+    (kpis.escalation_critical_issues || 0) > 0 ||
+    (kpis.escalation_open_tickets || 0) > 0 ||
+    (kpis.escalation_pending_authority_response || 0) > 0
 
   return (
     <div className="flex flex-col">
       <KpiGrid kpis={kpis} />
+
+      {hasEscalationData && <EscalationKpiStrip kpis={kpis} />}
 
       <QuickActionsBar
         onStartInspection={() => navigate('/inspections')}
@@ -67,7 +74,7 @@ export default function Dashboard() {
       />
 
       {!hasAnyData ? (
-        <EmptyState
+        <DashboardEmptyPanel
           icon="fa-solid fa-satellite-dish"
           title="No municipal activity yet"
           message="Register an asset or load the sample dataset to see live KPIs, the GIS map, and activity here."
@@ -75,7 +82,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/inspections?loadSample=1')}
-              className="inline-flex items-center gap-2 rounded-sm bg-accent-blue px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-accent-blue-hover"
+              className="inline-flex items-center gap-2 rounded-sm bg-[#0f172a] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#1e293b]"
             >
               <i className="fa-solid fa-folder-open" /> Load Sample Dataset
             </button>
