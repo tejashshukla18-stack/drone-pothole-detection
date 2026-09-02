@@ -23,8 +23,8 @@ export default function MissionsTable({ status, missions, onRetry, onReview, onC
         <img src="/drone-illustration.svg" alt="" className="h-20 w-24 opacity-80" />
         <h4 className="text-[15px] font-bold text-text-primary">No missions logged yet</h4>
         <p className="max-w-sm text-[13px] leading-relaxed text-text-muted">
-          Upload aerial photos via the ingestion console or schedule an autonomous flight mission to start
-          building your survey log.
+          Upload aerial flight video via the ingestion console or schedule an autonomous flight mission to
+          start building your survey log.
         </p>
         <button
           type="button"

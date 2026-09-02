@@ -11,7 +11,7 @@ import { useToast } from '../context/ToastContext.jsx'
 
 const STAT_TILES = [
   { key: 'totalMissions', label: 'Missions Logged', icon: 'fa-clipboard-list', tone: 'text-text-primary' },
-  { key: 'totalFrames', label: 'Frames Analyzed', icon: 'fa-images', tone: 'text-text-primary' },
+  { key: 'totalFrames', label: 'Frames Analyzed', icon: 'fa-film', tone: 'text-text-primary' },
   { key: 'totalDefects', label: 'Defects Found', icon: 'fa-triangle-exclamation', tone: 'text-p2' },
   { key: 'highSeverityCount', label: 'High Severity', icon: 'fa-circle-exclamation', tone: 'text-p1' },
 ]
@@ -105,9 +105,11 @@ export default function Inspections() {
   async function runInspection(runner, successLabel) {
     setIsProcessing(true)
     try {
-      setProgress({ percent: 30, label: 'Uploading Drone Aerial Imagery...' })
-      await new Promise((r) => setTimeout(r, 350))
-      setProgress({ percent: 70, label: 'NMS Suppression & Severity Classification...' })
+      setProgress({ percent: 20, label: 'Uploading Drone Flight Footage...' })
+      await new Promise((r) => setTimeout(r, 300))
+      setProgress({ percent: 55, label: 'Extracting Frames from Video...' })
+      await new Promise((r) => setTimeout(r, 300))
+      setProgress({ percent: 85, label: 'NMS Suppression & Severity Classification...' })
 
       const data = await runner()
 
@@ -135,7 +137,7 @@ export default function Inspections() {
   function handleLoadSampleDataset() {
     runInspection(
       () => inspectSample({ assetId: targetAssetId, filenames: SAMPLE_DATASET_FILENAMES }),
-      () => 'Sample drone flight imagery loaded & analyzed!',
+      () => 'Sample drone flight video loaded & analyzed!',
     )
   }
 

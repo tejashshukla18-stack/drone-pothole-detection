@@ -3,6 +3,10 @@ import ReviewCanvas from './ReviewCanvas.jsx'
 import Filmstrip from './Filmstrip.jsx'
 import MosaicGrid from './MosaicGrid.jsx'
 import DefectInspectorPanel from './DefectInspectorPanel.jsx'
+import AIDetectionsTable from './AIDetectionsTable.jsx'
+import EvidenceStrip from './EvidenceStrip.jsx'
+import InspectionInfoCard from './InspectionInfoCard.jsx'
+import OfficerVerificationBar from './OfficerVerificationBar.jsx'
 import CreateWorkOrderModal from './CreateWorkOrderModal.jsx'
 import { useToast } from '../../../context/ToastContext.jsx'
 import {
@@ -253,23 +257,38 @@ export default function ReviewWorkbench({ mission, results, assets, onBack, onSy
 
   return (
     <div className="flex flex-col gap-4">
-      <button
-        type="button"
-        onClick={onBack}
-        className="inline-flex w-fit items-center gap-2 text-xs font-semibold text-text-secondary transition-colors hover:text-accent-blue"
-      >
-        <i className="fa-solid fa-arrow-left" /> Back to Missions &amp; Ingestion
-      </button>
+      {/* Header bar */}
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border bg-bg-card px-4 py-3 shadow-card-sm">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-text-secondary transition-colors hover:text-accent-blue"
+          >
+            <i className="fa-solid fa-arrow-left" /> Back
+          </button>
+          <div className="h-4 w-px bg-border" />
+          <h2 className="font-mono text-sm font-bold text-text-primary">
+            {mission?.id || '—'} <span className="text-text-muted">&middot;</span> {mission?.asset_name || 'Unknown Asset'}
+          </h2>
+        </div>
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-blue/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-accent-blue">
+          <i className="fa-solid fa-magnifying-glass" /> Review
+        </span>
+      </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_380px]">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_340px]">
         {/* Canvas Panel */}
         <div className="flex min-h-[560px] flex-col overflow-hidden rounded-md border border-border bg-bg-card shadow-card-sm">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-accent-blue/10 px-2.5 py-1 text-[11px] font-bold text-accent-blue">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-blue/10 px-2.5 py-1 text-[11px] font-bold text-accent-blue">
+                <i className="fa-solid fa-play" /> Drone Footage
+              </span>
+              <span className="rounded-full bg-border px-2.5 py-1 font-mono text-[11px] font-semibold text-text-secondary">
                 {activeItem?.filename || 'No Frame Loaded'}
               </span>
-              <span className="rounded-full bg-border px-2.5 py-1 text-[11px] font-semibold text-text-secondary">
+              <span className="rounded-full bg-border px-2.5 py-1 font-mono text-[11px] font-semibold text-text-secondary">
                 {imageDims ? `${imageDims.width} × ${imageDims.height} px` : '-- × -- px'}
               </span>
             </div>
@@ -332,7 +351,7 @@ export default function ReviewWorkbench({ mission, results, assets, onBack, onSy
               >
                 <i className="fa-solid fa-chevron-left" /> Previous
               </button>
-              <span>
+              <span className="font-mono">
                 Frame {localResults.length === 0 ? 0 : activeIndex + 1} of {localResults.length}
               </span>
               <button
@@ -347,37 +366,54 @@ export default function ReviewWorkbench({ mission, results, assets, onBack, onSy
           </div>
         </div>
 
-        {/* Inspector Panel */}
-        <div className="rounded-md border border-border bg-bg-card p-4 shadow-card-sm">
-          <DefectInspectorPanel
-            activeItem={activeItem}
-            boxes={activeBoxes}
-            missionTotalDefects={missionTotalDefects}
-            engineUsed={engineUsed}
-            sensitivity={sensitivity}
-            onSensitivityChange={(value) => {
-              setSensitivity(value)
-              // Auto-trigger re-analysis when sensitivity selection changes.
-              setTimeout(handleReanalyze, 0)
-            }}
-            onReanalyze={handleReanalyze}
-            isReanalyzing={isReanalyzing}
-            notes={notes}
-            onNotesChange={setNotes}
-            selectedBoxId={selectedBoxId}
-            onSelectBox={setSelectedBoxId}
-            onDeleteBox={handleDeleteBox}
-            onApproveFrame={handleApproveFrame}
-            isVerifying={isVerifying}
-            onApproveBatch={handleApproveBatch}
-            isBatchVerifying={isBatchVerifying}
-            onGenerateReport={handleGenerateReport}
-            isGeneratingReport={isGeneratingReport}
-            onDispatchWorkOrder={() => setWorkOrderOpen(true)}
-            onFlagFalsePositive={handleFlagFalsePositive}
-          />
-        </div>
+        {/* Inspection Info */}
+        <InspectionInfoCard
+          mission={mission}
+          frameCount={localResults.length}
+          onApproveBatch={handleApproveBatch}
+          isBatchVerifying={isBatchVerifying}
+          onGenerateReport={handleGenerateReport}
+          isGeneratingReport={isGeneratingReport}
+        />
       </div>
+
+      <AIDetectionsTable
+        boxes={activeBoxes}
+        selectedBoxId={selectedBoxId}
+        onSelect={setSelectedBoxId}
+        onDelete={handleDeleteBox}
+      />
+
+      <DefectInspectorPanel
+        activeItem={activeItem}
+        boxes={activeBoxes}
+        missionTotalDefects={missionTotalDefects}
+        engineUsed={engineUsed}
+        sensitivity={sensitivity}
+        onSensitivityChange={(value) => {
+          setSensitivity(value)
+          // Auto-trigger re-analysis when sensitivity selection changes.
+          setTimeout(handleReanalyze, 0)
+        }}
+        onReanalyze={handleReanalyze}
+        isReanalyzing={isReanalyzing}
+      />
+
+      <EvidenceStrip
+        imageUrl={activeItem ? getImageUrl(activeItem) : null}
+        boxes={activeBoxes}
+        imageDims={imageDims}
+      />
+
+      <OfficerVerificationBar
+        notes={notes}
+        onNotesChange={setNotes}
+        onConfirm={handleApproveFrame}
+        isVerifying={isVerifying}
+        onFalsePositive={handleFlagFalsePositive}
+        onFieldSurvey={() => setWorkOrderOpen(true)}
+        disabled={!activeItem}
+      />
 
       <CreateWorkOrderModal
         isOpen={isWorkOrderOpen}

@@ -1,15 +1,57 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 function formatFileSize(bytes) {
   return `${(bytes / 1024 / 1024).toFixed(2)} MB`
 }
 
-const PIPELINE_STAGES = ['Upload', 'Detect', 'Classify']
+function formatDuration(seconds) {
+  if (seconds == null || Number.isNaN(seconds)) return '--:--'
+  const m = Math.floor(seconds / 60)
+  const s = Math.floor(seconds % 60)
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+// Video files don't carry duration as a plain property like images carry
+// dimensions - it has to be read by loading metadata into a hidden <video>.
+function useVideoDurations(files) {
+  const [durations, setDurations] = useState({})
+
+  useEffect(() => {
+    let cancelled = false
+    files.forEach((file) => {
+      const key = `${file.name}-${file.size}-${file.lastModified}`
+      if (durations[key] !== undefined) return
+      const url = URL.createObjectURL(file)
+      const videoEl = document.createElement('video')
+      videoEl.preload = 'metadata'
+      videoEl.src = url
+      videoEl.onloadedmetadata = () => {
+        if (!cancelled) {
+          setDurations((prev) => ({ ...prev, [key]: videoEl.duration }))
+        }
+        URL.revokeObjectURL(url)
+      }
+      videoEl.onerror = () => {
+        if (!cancelled) setDurations((prev) => ({ ...prev, [key]: null }))
+        URL.revokeObjectURL(url)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files])
+
+  return (file) => durations[`${file.name}-${file.size}-${file.lastModified}`]
+}
+
+const PIPELINE_STAGES = ['Upload', 'Extract Frames', 'Detect', 'Classify']
 
 function stageIndexForPercent(percent) {
-  if (percent >= 100) return 3
-  if (percent >= 70) return 2
-  if (percent >= 30) return 1
+  if (percent >= 100) return 4
+  if (percent >= 75) return 3
+  if (percent >= 45) return 2
+  if (percent >= 15) return 1
   return 0
 }
 
@@ -26,9 +68,10 @@ export default function UploadPanel({
 }) {
   const [isDragOver, setDragOver] = useState(false)
   const fileInputRef = useRef(null)
+  const getDuration = useVideoDurations(selectedFiles)
 
   function handleFiles(fileList) {
-    const files = Array.from(fileList).slice(0, 50)
+    const files = Array.from(fileList).slice(0, 5)
     onFilesSelected(files)
   }
 
@@ -44,7 +87,7 @@ export default function UploadPanel({
             <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
               <i className="fa-solid fa-cloud-arrow-up text-accent-blue" /> Mission Ingestion
             </h3>
-            <p className="mt-0.5 text-xs text-text-muted">Drop high-res aerial frames for CV analysis</p>
+            <p className="mt-0.5 text-xs text-text-muted">Drop aerial flight video for CV analysis</p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-accent-teal/25 bg-accent-teal/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-teal">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-teal" />
@@ -110,9 +153,9 @@ export default function UploadPanel({
             />
           ))}
 
-          <i className="fa-solid fa-helicopter mb-1 text-3xl text-accent-blue/70" />
-          <h4 className="text-sm font-bold text-text-primary">Drag &amp; drop drone photos here</h4>
-          <p className="text-xs text-text-muted">JPG, PNG up to 50MB per frame &middot; max 50 images</p>
+          <i className="fa-solid fa-video mb-1 text-3xl text-accent-blue/70" />
+          <h4 className="text-sm font-bold text-text-primary">Drag &amp; drop drone flight video here</h4>
+          <p className="text-xs text-text-muted">MP4, MOV, AVI up to 2GB per file &middot; max 5 videos</p>
           <span className="text-xs font-semibold text-accent-blue underline underline-offset-2">
             or browse local files
           </span>
@@ -120,7 +163,7 @@ export default function UploadPanel({
             ref={fileInputRef}
             type="file"
             multiple
-            accept="image/*"
+            accept="video/*"
             className="hidden"
             onChange={(e) => {
               if (e.target.files.length > 0) handleFiles(e.target.files)
@@ -137,7 +180,7 @@ export default function UploadPanel({
             disabled={isProcessing}
             className="inline-flex items-center gap-2 rounded-full border border-accent-teal/30 bg-accent-teal/10 px-3 py-1.5 text-xs font-semibold text-accent-teal transition-colors hover:bg-accent-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <i className="fa-solid fa-images" /> Load 6 flight sample frames
+            <i className="fa-solid fa-clapperboard" /> Load sample flight video
           </button>
         </div>
 
@@ -156,14 +199,14 @@ export default function UploadPanel({
               />
             </div>
 
-            {/* Pipeline stepper: this genuinely is a sequence (upload -> detect
-                -> classify), so numbering/ordering here is informative. */}
+            {/* Pipeline stepper: this genuinely is a sequence (upload -> extract
+                frames -> detect -> classify), so ordering here is informative. */}
             <div className="flex items-center">
               {PIPELINE_STAGES.map((stage, idx) => (
                 <div key={stage} className="flex flex-1 items-center last:flex-initial">
                   <div className="flex items-center gap-1.5">
                     <span
-                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
                         idx < activeStage
                           ? 'bg-accent-blue text-white'
                           : idx === activeStage
@@ -174,7 +217,7 @@ export default function UploadPanel({
                       {idx < activeStage ? <i className="fa-solid fa-check text-[9px]" /> : idx + 1}
                     </span>
                     <span
-                      className={`text-[11px] font-semibold ${
+                      className={`whitespace-nowrap text-[11px] font-semibold ${
                         idx <= activeStage ? 'text-text-primary' : 'text-text-muted'
                       }`}
                     >
@@ -207,7 +250,7 @@ export default function UploadPanel({
       <div className="rounded-md border border-border bg-bg-card p-5 shadow-card-sm">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-            <i className="fa-solid fa-list-check text-accent-blue" /> Frame Manifest
+            <i className="fa-solid fa-list-check text-accent-blue" /> Video Manifest
           </h3>
           <span className="rounded-full bg-border px-2.5 py-1 font-mono text-[11px] font-bold text-text-secondary">
             {selectedFiles.length} queued
@@ -216,8 +259,8 @@ export default function UploadPanel({
 
         {selectedFiles.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-center text-text-muted">
-            <i className="fa-solid fa-images text-2xl opacity-50" />
-            <p className="text-xs">No frames queued. Upload files or load a sample mission.</p>
+            <i className="fa-solid fa-video text-2xl opacity-50" />
+            <p className="text-xs">No video files queued. Upload footage or load a sample mission.</p>
           </div>
         ) : (
           <>
@@ -230,8 +273,11 @@ export default function UploadPanel({
                   <span className="w-5 shrink-0 text-right font-mono text-[10px] text-text-muted">
                     {String(idx + 1).padStart(2, '0')}
                   </span>
-                  <i className="fa-solid fa-image shrink-0 text-accent-blue" />
+                  <i className="fa-solid fa-file-video shrink-0 text-accent-blue" />
                   <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{file.name}</span>
+                  <span className="shrink-0 font-mono text-[11px] text-text-muted">
+                    {formatDuration(getDuration(file))}
+                  </span>
                   <span className="shrink-0 font-mono text-[11px] text-text-muted">
                     {formatFileSize(file.size)}
                   </span>
