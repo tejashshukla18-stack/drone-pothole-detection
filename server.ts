@@ -477,6 +477,35 @@ app.get('/api/assets', (_req, res) => {
   res.json({ assets: dashboardOverview.assets });
 });
 
+app.post('/api/assets', (req, res) => {
+  const payload = req.body || {};
+  const name = String(payload.name || '').trim();
+  const latitude = Number(payload.lat ?? payload.latitude);
+  const longitude = Number(payload.lng ?? payload.longitude);
+  if (!name) return res.status(400).json({ error: 'Asset name is required.' });
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    return res.status(400).json({ error: 'Enter a valid latitude (-90 to 90) and longitude (-180 to 180).' });
+  }
+  const id = `asset-${Date.now()}`;
+  const suppliedCode = String(payload.code || '').trim();
+  const asset = {
+    id,
+    name,
+    code: suppliedCode || `AST-${String(dashboardOverview.assets.length + 1).padStart(3, '0')}`,
+    type: ['Road', 'Bridge', 'Municipal Surface'].includes(payload.type) ? payload.type : 'Road',
+    district: String(payload.district || 'Central Metro District').trim(),
+    surface_type: String(payload.surface_type || 'Dense Graded Hot-Mix Asphalt').trim(),
+    latitude,
+    longitude,
+    location: { lat: latitude, lng: longitude },
+    health_score: 100,
+    total_defects: 0,
+    created_at: new Date().toISOString(),
+  };
+  dashboardOverview.assets.push(asset);
+  return res.status(201).json({ asset });
+});
+
 app.get('/api/missions', (_req, res) => {
   res.json({ missions });
 });
