@@ -1,15 +1,15 @@
-import { useLocation, useNavigate } from 'react-router-dom'
-import { getNavItemByPath } from '../../config/navigation.js'
-import NotificationDrawer from './NotificationDrawer.jsx'
+import { useLocation, useNavigate } from "react-router-dom";
+import { getNavItemByPath } from "../../config/navigation.js";
+import NotificationDrawer from "./NotificationDrawer.jsx";
 
 export default function TopHeader({ onMenuToggle }) {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const current = getNavItemByPath(location.pathname)
+  const location = useLocation();
+  const navigate = useNavigate();
+  const current = getNavItemByPath(location.pathname);
 
-  const title = current?.title ?? 'AeroPath AI'
+  const title = current?.title ?? "AeroPatch";
   const subtitle =
-    current?.subtitle ?? 'Drone pavement decision support system'
+    current?.subtitle ?? "Drone pavement decision support system";
 
   return (
     <header className="sticky top-0 z-[90] flex h-[70px] items-center justify-between border-b border-border bg-bg-surface px-4 md:px-7">
@@ -33,16 +33,11 @@ export default function TopHeader({ onMenuToggle }) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2 md:gap-3.5">
-        <div className="hidden items-center gap-2 rounded-full border border-accent-teal/25 bg-accent-teal/10 px-3 py-1.5 text-[12px] font-semibold text-accent-teal lg:flex">
-          <i className="fa-solid fa-tower-broadcast" />
-          <span>RTK GPS Fixed (0.8cm)</span>
-        </div>
-
         <NotificationDrawer />
 
         <button
           type="button"
-          onClick={() => navigate('/inspections')}
+          onClick={() => navigate("/inspections")}
           className="inline-flex items-center gap-2 whitespace-nowrap rounded-sm bg-[#0f172a] px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#1e293b]"
         >
           <i className="fa-solid fa-plus" />
@@ -50,5 +45,5 @@ export default function TopHeader({ onMenuToggle }) {
         </button>
       </div>
     </header>
-  )
+  );
 }

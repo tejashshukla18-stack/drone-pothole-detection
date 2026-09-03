@@ -1,37 +1,40 @@
-import Spinner from '../ui/Spinner.jsx'
-import EmptyState from '../ui/EmptyState.jsx'
+import Spinner from "../ui/Spinner.jsx";
+import EmptyState from "../ui/EmptyState.jsx";
 
 function buildDefectRows(report) {
-  const rows = []
-  ;(report?.images || []).forEach((img, imgIdx) => {
-    ;(img.bounding_boxes || []).forEach((b, bIdx) => {
+  const rows = [];
+  (report?.images || []).forEach((img, imgIdx) => {
+    (img.bounding_boxes || []).forEach((b, bIdx) => {
       rows.push({
         plate: `Plate #${imgIdx + 1}`,
         defect_num: `D-${imgIdx + 1}.${bIdx + 1}`,
-        classification: b.label || 'Severe Pothole / Asphalt Cavity',
-        area_cm2: b.area_cm2 || Math.round((b.width || 80) * (b.height || 60) * 0.05),
-        confidence: b.confidence || '92%',
-        coords: `X:${b.x ?? '--'} Y:${b.y ?? '--'}`,
-      })
-    })
-  })
-  return rows
+        classification: b.label || "Severe Pothole / Asphalt Cavity",
+        area_cm2:
+          b.area_cm2 || Math.round((b.width || 80) * (b.height || 60) * 0.05),
+        confidence: b.confidence || "92%",
+        coords: `X:${b.x ?? "--"} Y:${b.y ?? "--"}`,
+      });
+    });
+  });
+  return rows;
 }
 
 export default function ReportPreview({ status, report, onGenerate, onRetry }) {
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="flex min-h-[420px] flex-col rounded-md border border-border bg-bg-card p-4 shadow-card-sm">
         <Spinner label="Loading report preview..." />
       </div>
-    )
+    );
   }
 
-  if (status === 'error') {
+  if (status === "error") {
     return (
       <div className="flex min-h-[420px] flex-col items-center justify-center gap-3 rounded-md border border-dashed border-p1/30 bg-p1/5 p-4 text-center shadow-card-sm">
         <i className="fa-solid fa-triangle-exclamation text-2xl text-p1" />
-        <p className="text-[13px] text-text-muted">This dossier could not be loaded.</p>
+        <p className="text-[13px] text-text-muted">
+          This dossier could not be loaded.
+        </p>
         {onRetry && (
           <button
             type="button"
@@ -42,7 +45,7 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
           </button>
         )}
       </div>
-    )
+    );
   }
 
   if (!report) {
@@ -59,18 +62,26 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
                 onClick={onGenerate}
                 className="inline-flex items-center gap-2 rounded-sm bg-accent-blue px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-accent-blue-hover"
               >
-                <i className="fa-solid fa-file-circle-plus" /> Generate New Dossier
+                <i className="fa-solid fa-file-circle-plus" /> Generate New
+                Dossier
               </button>
             )
           }
         />
       </div>
-    )
+    );
   }
 
-  const summary = report.defects_summary || { total: 0, p1_high: 0, p2_medium: 0, p3_low: 0 }
-  const allImages = (report.images || []).map((im) => im.image_url).filter(Boolean)
-  const defectRows = buildDefectRows(report)
+  const summary = report.defects_summary || {
+    total: 0,
+    p1_high: 0,
+    p2_medium: 0,
+    p3_low: 0,
+  };
+  const allImages = (report.images || [])
+    .map((im) => im.image_url)
+    .filter(Boolean);
+  const defectRows = buildDefectRows(report);
 
   return (
     <div className="flex flex-col rounded-md border border-border bg-bg-card p-4 shadow-card-sm">
@@ -79,7 +90,9 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent-teal/10 px-2.5 py-1 text-[11px] font-bold text-accent-teal">
             <i className="fa-solid fa-stamp" /> PE Certified
           </span>
-          <span className="text-[12px] font-semibold text-text-muted">{report.report_number}</span>
+          <span className="text-[12px] font-semibold text-text-muted">
+            {report.report_number}
+          </span>
         </div>
         <div className="flex gap-2">
           <button
@@ -101,15 +114,19 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
 
       <div className="printable-report-sheet flex flex-col gap-5 text-text-primary">
         <div className="flex items-center gap-4 border-b-2 border-text-primary pb-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-blue/10 text-2xl text-accent-blue">
-            <i className="fa-solid fa-helicopter" />
-          </div>
+          <img
+            src="/logo-aeropatch.png"
+            alt="AeroPatch — Infrastructure Drone Solutions"
+            className="h-12 w-auto shrink-0"
+            width={1469}
+            height={704}
+          />
           <div className="min-w-0 flex-1">
             <h3 className="text-[14px] font-extrabold uppercase tracking-wide">
               Department of Transportation &amp; Infrastructure
             </h3>
             <p className="text-[11px] font-medium text-text-muted">
-              AeroPath AI Autonomous Drone Pavement Inspection Dossier
+              AeroPatch Autonomous Drone Pavement Inspection Dossier
             </p>
           </div>
           <div className="shrink-0 rounded-sm border border-p1/40 px-2.5 py-1.5 text-center text-[10px] font-bold text-p1">
@@ -126,14 +143,20 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
         </div>
 
         <section>
-          <h4 className="mb-1.5 text-[13px] font-bold">1. Executive Condition Assessment</h4>
+          <h4 className="mb-1.5 text-[13px] font-bold">
+            1. Executive Condition Assessment
+          </h4>
           <p className="text-[13px] leading-relaxed text-text-secondary">
             {report.executive_summary}
           </p>
         </section>
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <MetricBox label="Health Score" value={report.health_score} tone="red" />
+          <MetricBox
+            label="Health Score"
+            value={report.health_score}
+            tone="red"
+          />
           <MetricBox label="Total Defects" value={summary.total} />
           <MetricBox label="Critical P1" value={summary.p1_high} tone="red" />
           <MetricBox
@@ -144,7 +167,9 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
         </div>
 
         <section>
-          <h4 className="mb-1.5 text-[13px] font-bold">2. Engineering Recommendations</h4>
+          <h4 className="mb-1.5 text-[13px] font-bold">
+            2. Engineering Recommendations
+          </h4>
           <ul className="list-disc space-y-1 pl-5 text-[13px] leading-relaxed text-text-secondary">
             {(report.recommendations || []).length > 0 ? (
               report.recommendations.map((rec, i) => <li key={i}>{rec}</li>)
@@ -159,23 +184,36 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
             3. Multi-Frame Aerial Photogrammetry Plates &amp; Defect Evidence
           </h4>
           <p className="mb-2.5 text-[11px] text-text-muted">
-            Full photographic evidence captured during flight mission. All frames are georeferenced
-            with computer vision bounding overlays.
+            Full photographic evidence captured during flight mission. All
+            frames are georeferenced with computer vision bounding overlays.
           </p>
           {allImages.length > 0 ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {allImages.map((imgUrl, idx) => (
-                <div key={idx} className="overflow-hidden rounded-sm border border-border">
-                  <img src={imgUrl} alt={`Photolog Plate ${idx + 1}`} className="h-28 w-full object-cover" />
+                <div
+                  key={idx}
+                  className="overflow-hidden rounded-sm border border-border"
+                >
+                  <img
+                    src={imgUrl}
+                    alt={`Photolog Plate ${idx + 1}`}
+                    className="h-28 w-full object-cover"
+                  />
                   <div className="bg-bg-surface px-2 py-1.5 text-[10px]">
-                    <strong className="block text-text-primary">Aerial Photolog Plate #{idx + 1}</strong>
-                    <span className="text-text-muted">Resolution: 4K UHD &bull; High Altitude Orthophoto</span>
+                    <strong className="block text-text-primary">
+                      Aerial Photolog Plate #{idx + 1}
+                    </strong>
+                    <span className="text-text-muted">
+                      Resolution: 4K UHD &bull; High Altitude Orthophoto
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-[12px] text-text-muted">No captured frames attached to this dossier.</p>
+            <p className="text-[12px] text-text-muted">
+              No captured frames attached to this dossier.
+            </p>
           )}
         </section>
 
@@ -198,27 +236,39 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
               <tbody className="divide-y divide-border">
                 {defectRows.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-3 py-4 text-center text-text-muted">
-                      No localized defect cavities logged on current flight frames.
+                    <td
+                      colSpan={6}
+                      className="px-3 py-4 text-center text-text-muted"
+                    >
+                      No localized defect cavities logged on current flight
+                      frames.
                     </td>
                   </tr>
                 ) : (
                   defectRows.map((d, i) => (
                     <tr key={i}>
                       <td className="px-3 py-2 font-semibold">{d.plate}</td>
-                      <td className="px-3 py-2 font-mono font-bold text-accent-blue">{d.defect_num}</td>
+                      <td className="px-3 py-2 font-mono font-bold text-accent-blue">
+                        {d.defect_num}
+                      </td>
                       <td className="px-3 py-2">{d.classification}</td>
-                      <td className="px-3 py-2 font-semibold">{d.area_cm2} cm²</td>
+                      <td className="px-3 py-2 font-semibold">
+                        {d.area_cm2} cm²
+                      </td>
                       <td className="px-3 py-2">
                         <span
                           className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
-                            parseInt(d.confidence, 10) > 85 ? 'bg-p1/15 text-p1' : 'bg-p2/15 text-p2'
+                            parseInt(d.confidence, 10) > 85
+                              ? "bg-p1/15 text-p1"
+                              : "bg-p2/15 text-p2"
                           }`}
                         >
                           {d.confidence}
                         </span>
                       </td>
-                      <td className="px-3 py-2 font-mono text-text-muted">{d.coords}</td>
+                      <td className="px-3 py-2 font-mono text-text-muted">
+                        {d.coords}
+                      </td>
                     </tr>
                   ))
                 )}
@@ -231,7 +281,9 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
             5. Issue Escalation &amp; Ticketing
           </h4>
           {(report.escalation_tickets || []).length === 0 ? (
-            <p className="text-[12px] text-text-muted">No escalation tickets are currently linked to this asset.</p>
+            <p className="text-[12px] text-text-muted">
+              No escalation tickets are currently linked to this asset.
+            </p>
           ) : (
             <div className="overflow-x-auto rounded-sm border border-border">
               <table className="w-full min-w-[560px] text-left text-[12px]">
@@ -248,12 +300,16 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
                 <tbody className="divide-y divide-border">
                   {report.escalation_tickets.map((t) => (
                     <tr key={t.ticketId}>
-                      <td className="px-3 py-2 font-mono font-bold text-accent-blue">{t.ticketId}</td>
+                      <td className="px-3 py-2 font-mono font-bold text-accent-blue">
+                        {t.ticketId}
+                      </td>
                       <td className="px-3 py-2">{t.issueType}</td>
                       <td className="px-3 py-2">{t.severity}</td>
                       <td className="px-3 py-2">{t.authorityName}</td>
                       <td className="px-3 py-2">{t.status}</td>
-                      <td className="px-3 py-2 font-mono text-text-muted">{t.workOrderId || '—'}</td>
+                      <td className="px-3 py-2 font-mono text-text-muted">
+                        {t.workOrderId || "—"}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -263,7 +319,7 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
         </section>
       </div>
     </div>
-  )
+  );
 }
 
 function MetaItem({ label, value }) {
@@ -272,15 +328,22 @@ function MetaItem({ label, value }) {
       <span className="text-text-muted">{label}</span>
       <strong className="text-text-primary">{value}</strong>
     </div>
-  )
+  );
 }
 
 function MetricBox({ label, value, tone }) {
-  const toneClass = tone === 'red' ? 'text-p1' : tone === 'yellow' ? 'text-p2' : 'text-text-primary'
+  const toneClass =
+    tone === "red"
+      ? "text-p1"
+      : tone === "yellow"
+        ? "text-p2"
+        : "text-text-primary";
   return (
     <div className="rounded-sm border border-border bg-bg-surface px-3 py-2.5 text-center">
-      <span className="block text-[10px] font-semibold uppercase text-text-muted">{label}</span>
+      <span className="block text-[10px] font-semibold uppercase text-text-muted">
+        {label}
+      </span>
       <h3 className={`text-[18px] font-extrabold ${toneClass}`}>{value}</h3>
     </div>
-  )
+  );
 }

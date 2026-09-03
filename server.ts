@@ -1987,5 +1987,5 @@ app.get('*', (req: Request, res: Response) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚁 AeroPath AI Decision Support System running on http://0.0.0.0:${PORT}`);
+  console.log(`🚁 AeroPatch Decision Support System running on http://0.0.0.0:${PORT}`);
 });

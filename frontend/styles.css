@@ -83,7 +83,10 @@ body {
     gap: 12px;
     border-bottom: 1px solid var(--border-color);
 }
-
+.brand-logo {
+    height: 44px;
+    width: auto;
+}
 .brand-icon {
     width: 40px;
     height: 40px;

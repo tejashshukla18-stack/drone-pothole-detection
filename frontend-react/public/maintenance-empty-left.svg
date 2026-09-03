@@ -1,0 +1,71 @@
+<svg width="380" height="300" viewBox="0 0 380 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+
+    <!-- Cold planer / milling machine -->
+    <g transform="translate(6,14)">
+      <rect x="8" y="70" width="150" height="14" rx="4" fill="#e2e8f0" />
+      <rect x="14" y="84" width="36" height="14" rx="3" fill="#f1f5f9" />
+      <rect x="112" y="84" width="36" height="14" rx="3" fill="#f1f5f9" />
+      <rect x="30" y="30" width="70" height="42" rx="6" fill="#f1f5f9" />
+      <rect x="40" y="14" width="34" height="20" rx="4" fill="#e2e8f0" />
+      <line x1="57" y1="14" x2="57" y2="4" />
+      <circle cx="57" cy="4" r="3" fill="#38bdf8" stroke="none" />
+      <!-- extending arm -->
+      <path d="M100 46 L172 20" />
+      <rect x="164" y="10" width="20" height="16" rx="3" fill="#e2e8f0" />
+      <!-- drum -->
+      <circle cx="90" cy="86" r="16" fill="#e2e8f0" />
+      <path d="M74 86 h32" stroke-dasharray="3 4" />
+    </g>
+
+    <!-- small scanning drone -->
+    <g transform="translate(238,10)">
+      <path d="M50 46 L18 26 M62 46 L94 26 M50 46 L18 66 M62 46 L94 66" />
+      <ellipse cx="18" cy="20" rx="16" ry="4" fill="#cbd5e1" stroke="none" />
+      <ellipse cx="94" cy="20" rx="16" ry="4" fill="#cbd5e1" stroke="none" />
+      <ellipse cx="18" cy="72" rx="16" ry="4" fill="#cbd5e1" stroke="none" />
+      <ellipse cx="94" cy="72" rx="16" ry="4" fill="#cbd5e1" stroke="none" />
+      <rect x="38" y="36" width="36" height="20" rx="8" fill="#f1f5f9" />
+      <circle cx="56" cy="60" r="6" fill="#e2e8f0" />
+      <!-- scan cone -->
+      <path d="M50 66 L20 122 M62 66 L92 122" stroke-dasharray="3 5" />
+      <ellipse cx="56" cy="122" rx="36" ry="7" stroke-dasharray="3 5" />
+    </g>
+
+    <!-- mini verification workflow -->
+    <g transform="translate(196,156)" stroke-width="1.6">
+      <rect x="0" y="18" width="48" height="22" rx="4" fill="#f1f5f9" />
+      <text x="24" y="32" font-size="7" fill="#64748b" stroke="none" text-anchor="middle" font-family="sans-serif">SCAN LOG</text>
+
+      <path d="M48 29 H68" marker-end="url(#arrowL)" />
+      <rect x="68" y="10" width="52" height="38" rx="4" fill="#eaf2fb" stroke="#7fa8cc" />
+      <text x="94" y="26" font-size="7" fill="#3d6a94" stroke="none" text-anchor="middle" font-family="sans-serif">REPAIR</text>
+      <text x="94" y="36" font-size="7" fill="#3d6a94" stroke="none" text-anchor="middle" font-family="sans-serif">VERIFY</text>
+
+      <path d="M120 18 H138" marker-end="url(#arrowL)" />
+      <circle cx="148" cy="18" r="9" fill="#e2e8f0" />
+      <path d="M144 18 l3 3 l5 -6" stroke="#0d9488" />
+
+      <path d="M94 48 V64" marker-end="url(#arrowL)" />
+      <rect x="70" y="64" width="48" height="22" rx="4" fill="#f1f5f9" />
+      <text x="94" y="78" font-size="7" fill="#64748b" stroke="none" text-anchor="middle" font-family="sans-serif">RE-INSPECT</text>
+    </g>
+
+    <!-- road roller / compactor -->
+    <g transform="translate(10,178)">
+      <circle cx="34" cy="90" r="26" fill="#f1f5f9" />
+      <circle cx="34" cy="90" r="26" stroke-dasharray="4 5" />
+      <rect x="52" y="46" width="70" height="34" rx="6" fill="#f1f5f9" />
+      <rect x="62" y="30" width="30" height="18" rx="4" fill="#e2e8f0" />
+      <rect x="112" y="66" width="46" height="22" rx="10" fill="#e2e8f0" />
+      <path d="M112 88 h46" stroke-dasharray="3 4" />
+      <line x1="34" y1="90" x2="34" y2="116" stroke-dasharray="2 4" />
+    </g>
+
+    <defs>
+      <marker id="arrowL" markerWidth="6" markerHeight="6" refX="4" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 Z" fill="#94a3b8" stroke="none" />
+      </marker>
+    </defs>
+  </g>
+</svg>

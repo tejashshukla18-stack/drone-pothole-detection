@@ -1,5 +1,5 @@
 {
-  "name": "AeroPath AI - Drone Road & Pothole Inspection Dashboard",
+ "name": "AeroPatch - Drone Road & Pothole Inspection Dashboard",
   "description": "AI-Powered Drone Road & Pothole Inspection Decision Support System for municipal road authorities and civil engineers.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
