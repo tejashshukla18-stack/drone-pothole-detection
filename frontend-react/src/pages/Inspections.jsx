@@ -5,7 +5,15 @@ import MissionsTable from '../components/inspections/MissionsTable.jsx'
 import CreateMissionModal from '../components/inspections/CreateMissionModal.jsx'
 import ReviewWorkbench from '../components/inspections/review/ReviewWorkbench.jsx'
 import { fetchAssets } from '../api/assets.js'
-import { fetchMissions, inspectBatch, inspectSample } from '../api/inspections.js'
+import {
+  fetchLiveInspection,
+  fetchMissions,
+  fetchVideoInspection,
+  inspectSample,
+  startLiveInspection,
+  startVideoInspection,
+  stopLiveInspection,
+} from '../api/inspections.js'
 import { SAMPLE_DATASET_FILENAMES, getFleetStats } from '../components/inspections/inspectionHelpers.js'
 import { useToast } from '../context/ToastContext.jsx'
 
@@ -28,6 +36,10 @@ export default function Inspections() {
   const [missionsStatus, setMissionsStatus] = useState('loading')
 
   const [targetAssetId, setTargetAssetId] = useState(presetAssetId)
+  const [selectedModel, setSelectedModel] = useState('pothole')
+  const [liveSource, setLiveSource] = useState('')
+  const [liveModel, setLiveModel] = useState('both')
+  const [liveStream, setLiveStream] = useState(null)
   const [selectedFiles, setSelectedFiles] = useState([])
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(null)
@@ -69,6 +81,30 @@ export default function Inspections() {
   useEffect(() => {
     if (presetAssetId) setTargetAssetId(presetAssetId)
   }, [presetAssetId])
+
+  // Poll only telemetry from the two background workers. Video capture and YOLO
+  // inference remain resident in the Python service and never run in the UI.
+  useEffect(() => {
+    if (!liveStream?.id || !['queued', 'running'].includes(liveStream.status)) return undefined
+    let cancelled = false
+    const poll = async () => {
+      try {
+        const snapshot = await fetchLiveInspection(liveStream.id)
+        if (!cancelled) setLiveStream(snapshot)
+      } catch (err) {
+        if (!cancelled) {
+          setLiveStream((current) => current ? { ...current, status: 'failed', last_error: err.message } : current)
+          showToast(err.message || 'Live detection connection was lost.', 'error')
+        }
+      }
+    }
+    poll()
+    const timer = window.setInterval(poll, 1000)
+    return () => {
+      cancelled = true
+      window.clearInterval(timer)
+    }
+  }, [liveStream?.id, liveStream?.status, showToast])
 
   // Supports the Dashboard "1-Click Load Sample Dataset" quick action, which
   // links here with ?loadSample=1 to trigger the sample flight immediately.
@@ -141,12 +177,59 @@ export default function Inspections() {
     )
   }
 
-  function handleRunBatchInspection() {
+  async function handleRunVideoInspection() {
     if (selectedFiles.length === 0) return
-    runInspection(
-      () => inspectBatch({ files: selectedFiles, assetId: targetAssetId }),
-      (count) => `Batch inspection complete for ${count} frames!`,
-    )
+    setIsProcessing(true)
+    try {
+      setProgress({ percent: 5, label: 'Uploading flight video...' })
+      const started = await startVideoInspection({ files: selectedFiles, assetId: targetAssetId, model: selectedModel })
+      const jobId = started.job.id
+      let snapshot = started
+      while (snapshot.job.status === 'queued' || snapshot.job.status === 'running') {
+        setProgress({
+          percent: Math.max(8, Math.min(99, snapshot.job.progress || 0)),
+          label: snapshot.job.status === 'queued'
+            ? 'Loading selected AI model...'
+            : `Analyzing video frames — ${snapshot.job.detections_found || 0} detections`,
+        })
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        snapshot = await fetchVideoInspection(jobId)
+      }
+      if (snapshot.job.status === 'failed') throw new Error(snapshot.job.error || 'Video inspection failed.')
+      setProgress({ percent: 100, label: 'Video inspection complete!' })
+      await loadMissions()
+      await loadAssets()
+      showToast(`Inspection complete: ${snapshot.job.detections_found || 0} detections in ${snapshot.job.processed_frames || 0} sampled frames.`, 'success')
+      setSelectedFiles([])
+      if (snapshot.mission) openReview({ ...snapshot.mission, images: snapshot.results || [] })
+    } catch (err) {
+      console.error('Video inspection error:', err)
+      showToast(err.message || 'Failed to complete video inspection.', 'error')
+    } finally {
+      setIsProcessing(false)
+      setProgress(null)
+    }
+  }
+
+  async function handleStartLiveDetection() {
+    try {
+      const stream = await startLiveInspection({ source: liveSource, model: liveModel, inferenceFps: 3 })
+      setLiveStream(stream)
+      showToast('Live detection started. New potholes and bridge defects will be written to detections.json.', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not start live detection.', 'error')
+    }
+  }
+
+  async function handleStopLiveDetection() {
+    if (!liveStream?.id) return
+    try {
+      const stream = await stopLiveInspection(liveStream.id)
+      setLiveStream(stream)
+      showToast('Live detection stopped. Existing events remain stored.', 'success')
+    } catch (err) {
+      showToast(err.message || 'Could not stop live detection.', 'error')
+    }
   }
 
   function handleMissionCreated() {
@@ -196,9 +279,18 @@ export default function Inspections() {
           setTargetAssetId(id)
           if (id) setSearchParams({ assetId: id }, { replace: true })
         }}
+        selectedModel={selectedModel}
+        onModelChange={setSelectedModel}
+        liveSource={liveSource}
+        onLiveSourceChange={setLiveSource}
+        liveModel={liveModel}
+        onLiveModelChange={setLiveModel}
+        liveStream={liveStream}
+        onStartLive={handleStartLiveDetection}
+        onStopLive={handleStopLiveDetection}
         selectedFiles={selectedFiles}
         onFilesSelected={setSelectedFiles}
-        onRunInspection={handleRunBatchInspection}
+        onRunInspection={handleRunVideoInspection}
         onLoadSampleDataset={handleLoadSampleDataset}
         isProcessing={isProcessing}
         progress={progress}

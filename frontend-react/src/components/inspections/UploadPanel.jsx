@@ -59,6 +59,15 @@ export default function UploadPanel({
   assets,
   targetAssetId,
   onTargetAssetChange,
+  selectedModel,
+  onModelChange,
+  liveSource,
+  onLiveSourceChange,
+  liveModel,
+  onLiveModelChange,
+  liveStream,
+  onStartLive,
+  onStopLive,
   selectedFiles,
   onFilesSelected,
   onRunInspection,
@@ -112,6 +121,86 @@ export default function UploadPanel({
               </option>
             ))}
           </select>
+        </div>
+
+        <div className="mb-4 flex flex-col gap-1.5">
+          <label htmlFor="detectionModel" className="text-xs font-semibold text-text-secondary">
+            <i className="fa-solid fa-microchip text-text-muted" /> Detection model
+          </label>
+          <select
+            id="detectionModel"
+            value={selectedModel}
+            onChange={(e) => onModelChange(e.target.value)}
+            className="w-full rounded-sm border border-border bg-bg-input px-3 py-2 text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
+          >
+            <option value="pothole">Road potholes — Hugging Face YOLO</option>
+            <option value="bridge">Bridge defects &amp; cracks — trained YOLO</option>
+          </select>
+          <p className="text-[11px] text-text-muted">
+            The selected model is isolated to this video job; it does not alter other inspections.
+          </p>
+        </div>
+
+        <div className="mb-4 rounded-sm border border-accent-teal/25 bg-accent-teal/5 p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <label htmlFor="liveSource" className="text-xs font-semibold text-text-secondary">
+              <i className="fa-solid fa-tower-broadcast text-accent-teal" /> Live detection source
+            </label>
+            <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
+              liveStream?.status === 'running' ? 'bg-accent-teal/15 text-accent-teal' : 'bg-border text-text-muted'
+            }`}>
+              {liveStream?.status || 'idle'}
+            </span>
+          </div>
+          <input
+            id="liveSource"
+            value={liveSource}
+            onChange={(e) => onLiveSourceChange(e.target.value)}
+            placeholder="rtsp://camera/stream, 0 for webcam, or C:\\video.mp4"
+            className="w-full rounded-sm border border-border bg-bg-input px-3 py-2 text-xs text-text-primary placeholder:text-text-muted focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
+          />
+          <div className="mt-2 flex gap-2">
+            <select
+              value={liveModel}
+              onChange={(e) => onLiveModelChange(e.target.value)}
+              className="min-w-0 flex-1 rounded-sm border border-border bg-bg-input px-2 py-2 text-xs text-text-primary"
+            >
+              <option value="both">Potholes + bridge cracks</option>
+              <option value="pothole">Potholes only</option>
+              <option value="bridge">Bridge defects only</option>
+            </select>
+            {liveStream?.status === 'running' || liveStream?.status === 'queued' ? (
+              <button
+                type="button"
+                onClick={onStopLive}
+                className="rounded-sm border border-p1/40 px-3 py-2 text-xs font-semibold text-p1 transition-colors hover:bg-p1/10"
+              >
+                Stop
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onStartLive}
+                disabled={!liveSource.trim()}
+                className="rounded-sm bg-accent-teal px-3 py-2 text-xs font-semibold text-white transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Start live
+              </button>
+            )}
+          </div>
+          <p className="mt-2 text-[11px] text-text-muted">
+            {liveStream
+              ? `${liveStream.frames_read || 0} frames captured · ${liveStream.frames_inferred || 0} analyzed · ${liveStream.detections_emitted || 0} new detections`
+              : 'Live capture keeps only the newest two frames so a slow model cannot delay the feed.'}
+          </p>
+          {liveStream?.last_error && <p className="mt-1 text-[11px] text-p1">{liveStream.last_error}</p>}
+          {liveStream?.preview_updated_at && (
+            <img
+              src={`${liveStream.preview_url}?t=${liveStream.preview_updated_at}`}
+              alt="Latest annotated live detection frame"
+              className="mt-3 max-h-48 w-full rounded-sm border border-border object-contain"
+            />
+          )}
         </div>
 
         {/* Viewfinder dropzone: corner brackets + faint survey grid, echoing an

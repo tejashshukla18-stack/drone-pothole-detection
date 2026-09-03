@@ -87,6 +87,55 @@ export async function inspectBatch({ files, assetId, sensitivity, droneModel, pi
   return data
 }
 
+/** POST /api/inspect-videos creates a non-blocking detection job for up to five videos. */
+export async function startVideoInspection({ files, assetId, model, confidence }) {
+  const formData = new FormData()
+  files.forEach((file) => formData.append('videos', file))
+  if (assetId) formData.append('asset_id', assetId)
+  formData.append('model', model === 'bridge' ? 'bridge' : 'pothole')
+  if (confidence != null) formData.append('confidence', String(confidence))
+  const res = await fetch('/api/inspect-videos', { method: 'POST', body: formData })
+  const data = await parseJsonSafely(res)
+  if (!res.ok) throw new Error(data?.error || data?.detail || 'Failed to start video inspection.')
+  return data
+}
+
+/** GET /api/video-jobs/:id returns progress and final annotated detection frames. */
+export async function fetchVideoInspection(jobId) {
+  const res = await fetch(`/api/video-jobs/${encodeURIComponent(jobId)}`)
+  const data = await parseJsonSafely(res)
+  if (!res.ok) throw new Error(data?.error || data?.detail || 'Failed to read video inspection progress.')
+  return data
+}
+
+/** Start non-blocking capture and detection for RTSP, a webcam index, or a local video path. */
+export async function startLiveInspection({ source, model = 'both', inferenceFps = 3 }) {
+  const res = await fetch('/api/live-streams', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ source, model, inference_fps: inferenceFps }),
+  })
+  const data = await parseJsonSafely(res)
+  if (!res.ok) throw new Error(data?.error || data?.detail || 'Failed to start live detection.')
+  return data.stream
+}
+
+/** Read live stream telemetry and the URL of its latest annotated frame. */
+export async function fetchLiveInspection(streamId) {
+  const res = await fetch(`/api/live-streams/${encodeURIComponent(streamId)}`)
+  const data = await parseJsonSafely(res)
+  if (!res.ok) throw new Error(data?.error || data?.detail || 'Failed to read live detection status.')
+  return data.stream
+}
+
+/** Stop a capture worker. Historic events stay available in runtime/detections.json. */
+export async function stopLiveInspection(streamId) {
+  const res = await fetch(`/api/live-streams/${encodeURIComponent(streamId)}`, { method: 'DELETE' })
+  const data = await parseJsonSafely(res)
+  if (!res.ok) throw new Error(data?.error || data?.detail || 'Failed to stop live detection.')
+  return data.stream
+}
+
 /**
  * POST /api/inspect/reanalyze
  * Body: { image_id, filename, image_url, sensitivity, operating_threshold }

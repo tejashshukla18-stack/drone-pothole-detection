@@ -203,6 +203,17 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Local dependencies and generated runtime data
+node_modules/
+frontend-react/node_modules/
+runtime/live/
+runtime/video-uploads/
+runtime/video-results/
+
+# Large training datasets and archives
+dataset/
+*.zip
+*.mp4
 # Ruff stuff:
 .ruff_cache/
 
@@ -221,3 +232,11 @@ __marimo__/
 node_modules/
 .vite/
 dist/
+
+# Locally deployed computer-vision weights and runtime cache
+backend/API/models/*.pt
+backend/API/.ultralytics/
+runtime/
+dataset/rdd2022-raw/
+training/pothole_rdd/data/
+training/pothole_rdd/runs/
