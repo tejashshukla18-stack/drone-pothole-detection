@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { TILE_ATTRIBUTION, TILE_MAX_ZOOM, TILE_URL } from '../../lib/mapTiles.js'
 import EmptyState from '../ui/EmptyState.jsx'
 import FormField from '../ui/FormField.jsx'
 import {
@@ -122,9 +123,9 @@ export default function EncroachmentMap({ parcels, onSelectParcel }) {
     })
     mapRef.current = map
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap & CartoDB',
-      maxZoom: 19,
+    L.tileLayer(TILE_URL, {
+      attribution: TILE_ATTRIBUTION,
+      maxZoom: TILE_MAX_ZOOM,
     }).addTo(map)
 
     return () => {

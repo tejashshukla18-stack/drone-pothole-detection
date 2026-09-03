@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { TILE_ATTRIBUTION, TILE_MAX_ZOOM, TILE_URL, severityToColor } from '../../lib/mapTiles.js'
 
 const DEFAULT_CENTER = [37.7749, -122.4194]
 const DEFAULT_ZOOM = 12
@@ -19,9 +20,9 @@ export default function DefectHeatmap({ clusters }) {
     })
     mapRef.current = map
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CartoDB',
-      maxZoom: 18,
+    L.tileLayer(TILE_URL, {
+      attribution: TILE_ATTRIBUTION,
+      maxZoom: TILE_MAX_ZOOM,
     }).addTo(map)
 
     return () => {
@@ -42,7 +43,7 @@ export default function DefectHeatmap({ clusters }) {
     ;(clusters || []).forEach((h) => {
       if (!h.lat || !h.lng) return
       latLngs.push([h.lat, h.lng])
-      const color = h.severity === 'High' ? '#ef4444' : '#f59e0b'
+      const color = severityToColor(h.severity || h.priority)
       const circle = L.circle([h.lat, h.lng], {
         color,
         fillColor: color,

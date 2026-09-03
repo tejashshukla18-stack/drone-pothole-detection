@@ -381,6 +381,8 @@ function createAutoWorkOrder(report: any, asset: any) {
     priority: 'P1 - Immediate Repair',
     status: 'Pending Dispatch',
     assigned_team: 'Municipal Rapid Asphalt Unit',
+    asset_location: assetCoordinates(asset),
+    location: assetCoordinates(asset),
     estimated_cost: report.total_rehabilitation_cost,
     timeline: [{ at: new Date().toISOString(), status: 'Auto-escalated by certified AI inspection report' }],
     created_at: new Date().toISOString(),
@@ -791,6 +793,7 @@ app.post('/api/maintenance', (req, res) => {
     asset_id: asset.id, asset_name: asset.name, title: String(req.body.title),
     priority: req.body.priority || 'P2 - Scheduled Maintenance', status: 'Pending Dispatch',
     assigned_team: req.body.contractor || 'Municipal Maintenance Unit', repair_method: req.body.repair_method || '',
+    asset_location: assetCoordinates(asset), location: assetCoordinates(asset),
     estimated_cost: Number(req.body.estimated_cost || 0), deadline: req.body.deadline || null,
     timeline: [{ at: new Date().toISOString(), status: 'Manually dispatched' }], created_at: new Date().toISOString(),
   };

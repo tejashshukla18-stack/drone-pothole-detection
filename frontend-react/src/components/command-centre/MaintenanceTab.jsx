@@ -6,7 +6,7 @@ import ErrorState from "../ui/ErrorState.jsx";
 import WorkOrderCard from "./WorkOrderCard.jsx";
 import CreateWorkOrderModal from "../inspections/review/CreateWorkOrderModal.jsx";
 import MaintenanceEmptyPanel from "./MaintenanceEmptyPanel.jsx";
-import DefectHeatmap from "./DefectHeatmap.jsx";
+import CommandCentreMap from "./CommandCentreMap.jsx";
 
 export default function MaintenanceTab() {
   const [status, setStatus] = useState("loading"); // loading | success | error
@@ -101,7 +101,7 @@ export default function MaintenanceTab() {
         />
       </div>
 
-      <DefectHeatmap clusters={workOrders} />
+      <CommandCentreMap workOrders={workOrders} />
 
       {workOrders.length === 0 ? (
         <MaintenanceEmptyPanel
