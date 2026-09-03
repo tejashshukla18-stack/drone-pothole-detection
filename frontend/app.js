@@ -37,6 +37,9 @@ const AppState = {
 
     // Leaflet Maps & Charts
     dashboardMap: null,
+    nfzLayerGroup: null,
+    nfzVisible: true,
+    nfzAlertRadiusM: 200,
     insightsMap: null,
     chartSeverity: null,
     chartTrends: null,
@@ -257,14 +260,17 @@ function initDashboardMap() {
         maxZoom: 19,
     }).addTo(map);
 
+    addNoFlyZones(map);
+
     // Plot Asset Markers dynamically if registered
     if (AppState.assets && AppState.assets.length > 0) {
         const latLngs = [];
         AppState.assets.forEach(asset => {
-            if (asset.location && asset.location.lat && asset.location.lng) {
-                latLngs.push([asset.location.lat, asset.location.lng]);
+            const coordinates = asset.location || { lat: asset.latitude, lng: asset.longitude };
+            if (coordinates && Number.isFinite(Number(coordinates.lat)) && Number.isFinite(Number(coordinates.lng))) {
+                latLngs.push([coordinates.lat, coordinates.lng]);
                 const color = asset.health_score < 70 ? '#ef4444' : asset.health_score < 85 ? '#f59e0b' : '#10b981';
-                const marker = L.circleMarker([asset.location.lat, asset.location.lng], {
+                const marker = L.circleMarker([coordinates.lat, coordinates.lng], {
                     radius: 10,
                     fillColor: color,
                     color: '#ffffff',
@@ -282,12 +288,62 @@ function initDashboardMap() {
                         </div>
                     </div>
                 `);
+                checkNfzProximity({ lat: Number(coordinates.lat), lng: Number(coordinates.lng) });
             }
         });
         if (latLngs.length > 1) {
             map.fitBounds(latLngs, { padding: [40, 40] });
         }
     }
+}
+
+const NO_FLY_ZONES = [
+    { id: 'airport', name: 'Airport Buffer — Class B', lat: 37.6213, lng: -122.3790, radius: 5000 },
+    { id: 'medical', name: 'Heliport & Medical Center', lat: 37.7631, lng: -122.4580, radius: 800 },
+    { id: 'municipal', name: 'Municipal Critical Infrastructure', lat: 37.7850, lng: -122.4060, radius: 600 },
+];
+
+function addNoFlyZones(map) {
+    AppState.nfzLayerGroup = L.layerGroup().addTo(map);
+    NO_FLY_ZONES.forEach(zone => {
+        L.circle([zone.lat, zone.lng], {
+            radius: zone.radius,
+            color: '#ef4444',
+            fillColor: '#ef4444',
+            fillOpacity: 0.20,
+            weight: 2,
+            dashArray: '8 6',
+        }).bindTooltip(`Restricted Airspace — ${zone.name}`, { sticky: true }).addTo(AppState.nfzLayerGroup);
+    });
+    const toggle = document.getElementById('btnToggleNfz');
+    if (toggle) {
+        toggle.onclick = () => {
+            AppState.nfzVisible = !AppState.nfzVisible;
+            AppState.nfzVisible ? AppState.nfzLayerGroup.addTo(map) : map.removeLayer(AppState.nfzLayerGroup);
+            toggle.setAttribute('aria-pressed', String(AppState.nfzVisible));
+            toggle.innerHTML = `<i class="fa-solid fa-ban"></i> ${AppState.nfzVisible ? 'Hide' : 'Show'} No-Fly Zones`;
+        };
+    }
+}
+
+function haversineMeters(first, second) {
+    const radians = value => value * Math.PI / 180;
+    const dLat = radians(second.lat - first.lat);
+    const dLng = radians(second.lng - first.lng);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(radians(first.lat)) * Math.cos(radians(second.lat)) * Math.sin(dLng / 2) ** 2;
+    return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function checkNfzProximity(coordinates) {
+    const zone = NO_FLY_ZONES.find(item => haversineMeters(coordinates, item) <= item.radius + AppState.nfzAlertRadiusM);
+    if (!zone) return false;
+    const warning = document.getElementById('nfzWarningHud');
+    if (warning) {
+        warning.classList.remove('hidden');
+        warning.textContent = '⚠️ RESTRICTED AIRSPACE: NO-FLY ZONE BREACH DETECTED';
+        warning.title = `${zone.name}: drone is inside or within ${AppState.nfzAlertRadiusM}m of its boundary.`;
+    }
+    return true;
 }
 
 // ==========================================

@@ -2,6 +2,20 @@ import Spinner from "../ui/Spinner.jsx";
 import EmptyState from "../ui/EmptyState.jsx";
 
 function buildDefectRows(report) {
+  if (Array.isArray(report?.potholes)) {
+    return report.potholes.map((pothole, index) => ({
+      plate: `Evidence #${index + 1}`,
+      defect_num: pothole.id,
+      classification: 'Pothole / Asphalt Cavity',
+      area_sqm: pothole.area_sqm,
+      depth_cm: pothole.depth_cm,
+      confidence: `${Math.round((pothole.confidence || 0) * 100)}%`,
+      severity: pothole.severity,
+      coords: `Lat: ${Number(pothole.coordinates?.lat || 0).toFixed(6)}, Lng: ${Number(pothole.coordinates?.lng || 0).toFixed(6)}`,
+      repair_material: pothole.repair_material,
+      snapshot_url: pothole.snapshot_url,
+    }))
+  }
   const rows = [];
   (report?.images || []).forEach((img, imgIdx) => {
     (img.bounding_boxes || []).forEach((b, bIdx) => {
@@ -79,7 +93,7 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
     p3_low: 0,
   };
   const allImages = (report.images || [])
-    .map((im) => im.image_url)
+    .map((im) => typeof im === 'string' ? im : im.image_url)
     .filter(Boolean);
   const defectRows = buildDefectRows(report);
 
@@ -92,6 +106,9 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
           </span>
           <span className="text-[12px] font-semibold text-text-muted">
             {report.report_number}
+          </span>
+          <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${report.overall_severity === 'High' ? 'bg-p1/15 text-p1' : report.overall_severity === 'Medium' ? 'bg-p2/15 text-p2' : 'bg-p3/15 text-p3'}`}>
+            {report.overall_severity || report.overall_condition}
           </span>
         </div>
         <div className="flex gap-2">
@@ -150,6 +167,13 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
             {report.executive_summary}
           </p>
         </section>
+
+        {report.work_order_id && (
+          <div className="rounded-sm border border-p1/40 bg-p1/5 px-3 py-2.5 text-[12px] text-p1">
+            <strong><i className="fa-solid fa-triangle-exclamation mr-1.5" />CRITICAL ESCALATION: P1 Ticket Auto-Generated</strong>
+            <span className="ml-2">Work order {report.work_order_id} is pending dispatch to Municipal Rapid Asphalt Unit.</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MetricBox
@@ -228,16 +252,18 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
                   <th className="px-3 py-2 font-semibold">Frame</th>
                   <th className="px-3 py-2 font-semibold">Defect #</th>
                   <th className="px-3 py-2 font-semibold">Cavity Type</th>
-                  <th className="px-3 py-2 font-semibold">Area (cm²)</th>
+                  <th className="px-3 py-2 font-semibold">Area / Depth</th>
                   <th className="px-3 py-2 font-semibold">Confidence</th>
+                  <th className="px-3 py-2 font-semibold">Severity</th>
                   <th className="px-3 py-2 font-semibold">GPS Telemetry</th>
+                  <th className="px-3 py-2 font-semibold">Repair Material</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {defectRows.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={8}
                       className="px-3 py-4 text-center text-text-muted"
                     >
                       No localized defect cavities logged on current flight
@@ -253,7 +279,7 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
                       </td>
                       <td className="px-3 py-2">{d.classification}</td>
                       <td className="px-3 py-2 font-semibold">
-                        {d.area_cm2} cm²
+                        {d.area_sqm != null ? `${d.area_sqm} m² / ${d.depth_cm} cm` : `${d.area_cm2} cm²`}
                       </td>
                       <td className="px-3 py-2">
                         <span
@@ -266,9 +292,13 @@ export default function ReportPreview({ status, report, onGenerate, onRetry }) {
                           {d.confidence}
                         </span>
                       </td>
+                      <td className="px-3 py-2">
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${d.severity === 'High' ? 'bg-p1/15 text-p1' : d.severity === 'Medium' ? 'bg-p2/15 text-p2' : 'bg-p3/15 text-p3'}`}>{d.severity || 'Unclassified'}</span>
+                      </td>
                       <td className="px-3 py-2 font-mono text-text-muted">
                         {d.coords}
                       </td>
+                      <td className="px-3 py-2 text-text-secondary">{d.repair_material || 'Field verification required'}</td>
                     </tr>
                   ))
                 )}

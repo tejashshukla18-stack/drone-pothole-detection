@@ -4,13 +4,15 @@ import { saveSettings } from '../../api/settings.js'
 import { useToast } from '../../context/ToastContext.jsx'
 
 const DEFAULTS = {
-  dep_name: 'Department of Transportation & Municipal Infrastructure',
-  city: 'Metropolitan City Authority',
+  department_name: 'Department of Transportation & Municipal Infrastructure',
+  city_name: 'Metropolitan City Authority',
   lead_engineer: 'Sarah Lin, PE',
-  license: 'CA-PE #84729 / FAA Part 107 #4910284',
-  coord_system: 'WGS84 (EPSG:4326) / UTM Zone 10N',
-  nms_iou: 0.35,
-  min_area: 85,
+  inspector_license: 'CA-PE #84729 / FAA Part 107 #4910284',
+  coordinate_system: 'WGS84 (EPSG:4326) / UTM Zone 10N',
+  nms_iou_threshold: 0.35,
+  min_defect_area_sqcm: 85,
+  auto_ticket_escalation: 'high_only',
+  nfz_alert_radius_m: 200,
 }
 
 export default function DepartmentSettingsForm({ settings }) {
@@ -46,15 +48,15 @@ export default function DepartmentSettingsForm({ settings }) {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <FormField
         label="Department / Authority Name"
-        value={form.dep_name}
-        onChange={(e) => update('dep_name', e.target.value)}
+        value={form.department_name}
+        onChange={(e) => update('department_name', e.target.value)}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="City / Municipality"
-          value={form.city}
-          onChange={(e) => update('city', e.target.value)}
+          value={form.city_name}
+          onChange={(e) => update('city_name', e.target.value)}
         />
         <FormField
           label="Lead Engineer (PE)"
@@ -66,13 +68,13 @@ export default function DepartmentSettingsForm({ settings }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FormField
           label="Inspector License / Seal #"
-          value={form.license}
-          onChange={(e) => update('license', e.target.value)}
+          value={form.inspector_license}
+          onChange={(e) => update('inspector_license', e.target.value)}
         />
         <FormField
           label="Geodetic Coordinate Datum"
-          value={form.coord_system}
-          onChange={(e) => update('coord_system', e.target.value)}
+          value={form.coordinate_system}
+          onChange={(e) => update('coordinate_system', e.target.value)}
         />
       </div>
 
@@ -87,15 +89,33 @@ export default function DepartmentSettingsForm({ settings }) {
           step="0.05"
           min="0.1"
           max="0.9"
-          value={form.nms_iou}
-          onChange={(e) => update('nms_iou', e.target.value)}
+          value={form.nms_iou_threshold}
+          onChange={(e) => update('nms_iou_threshold', e.target.value)}
         />
         <FormField
           label="Min Cavity Area (cm²)"
           type="number"
-          value={form.min_area}
-          onChange={(e) => update('min_area', e.target.value)}
+          value={form.min_defect_area_sqcm}
+          onChange={(e) => update('min_defect_area_sqcm', e.target.value)}
         />
+      </div>
+
+      <div className="mt-1 flex items-center gap-2 text-[13px] font-bold text-text-primary">
+        <i className="fa-solid fa-tower-broadcast text-accent-blue" /> Operational Controls
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <label className="flex flex-col gap-1.5 text-xs font-semibold text-text-secondary">
+          Auto-ticket threshold
+          <select value={form.auto_ticket_escalation} onChange={(e) => update('auto_ticket_escalation', e.target.value)} className="rounded-sm border border-border bg-bg-input px-3 py-2 text-sm text-text-primary">
+            <option value="high_only">High only</option>
+            <option value="medium_high">Medium &amp; High</option>
+            <option value="manual_only">Manual only</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-1.5 text-xs font-semibold text-text-secondary">
+          NFZ proximity warning: {form.nfz_alert_radius_m} m
+          <input type="range" min="100" max="1000" step="50" value={form.nfz_alert_radius_m} onChange={(e) => update('nfz_alert_radius_m', Number(e.target.value))} className="accent-accent-blue" />
+        </label>
       </div>
 
       <button

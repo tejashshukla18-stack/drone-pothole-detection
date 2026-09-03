@@ -11,12 +11,14 @@ import Spinner from '../components/ui/Spinner.jsx'
 import ErrorState from '../components/ui/ErrorState.jsx'
 import DashboardEmptyPanel from '../components/dashboard/DashboardEmptyPanel.jsx'
 import { fetchDashboardOverview } from '../api/dashboard.js'
+import { fetchSettings } from '../api/settings.js'
 
 export default function Dashboard() {
   const navigate = useNavigate()
 
   const [status, setStatus] = useState('loading') // loading | success | error
   const [overview, setOverview] = useState(null)
+  const [nfzAlertRadiusM, setNfzAlertRadiusM] = useState(200)
 
   const [isRegisterOpen, setRegisterOpen] = useState(false)
   const [isWorkOrderOpen, setWorkOrderOpen] = useState(false)
@@ -26,6 +28,8 @@ export default function Dashboard() {
     try {
       const data = await fetchDashboardOverview()
       setOverview(data)
+      const settings = await fetchSettings().catch(() => ({ settings: {} }))
+      setNfzAlertRadiusM(Number(settings.settings?.nfz_alert_radius_m) || 200)
       setStatus('success')
     } catch (err) {
       console.error('Error fetching dashboard overview:', err)
@@ -113,7 +117,7 @@ export default function Dashboard() {
                 </span>
               </div>
             </div>
-            <DashboardMap assets={assets} />
+            <DashboardMap assets={assets} alertRadiusM={nfzAlertRadiusM} />
           </div>
 
           <div className="rounded-md border border-border bg-bg-card p-4 shadow-card-sm">
