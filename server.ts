@@ -1,14 +1,15 @@
 import express from 'express';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { mkdirSync } from 'fs';
 import { randomUUID } from 'crypto';
 import { spawn } from 'child_process';
 import multer from 'multer';
 import sharp from 'sharp';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// The production build is CommonJS (`dist/server.cjs`), where `import.meta.url`
+// is undefined. Both local development and the Render container start from the
+// project root, so resolve project files from the process working directory.
+const __dirname = process.env.PROJECT_ROOT || process.cwd();
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
