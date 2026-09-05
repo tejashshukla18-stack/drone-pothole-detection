@@ -1,58 +1,58 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from "react";
 
 function formatFileSize(bytes) {
-  return `${(bytes / 1024 / 1024).toFixed(2)} MB`
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 }
 
 function formatDuration(seconds) {
-  if (seconds == null || Number.isNaN(seconds)) return '--:--'
-  const m = Math.floor(seconds / 60)
-  const s = Math.floor(seconds % 60)
-  return `${m}:${String(s).padStart(2, '0')}`
+  if (seconds == null || Number.isNaN(seconds)) return "--:--";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
 }
 
 // Video files don't carry duration as a plain property like images carry
 // dimensions - it has to be read by loading metadata into a hidden <video>.
 function useVideoDurations(files) {
-  const [durations, setDurations] = useState({})
+  const [durations, setDurations] = useState({});
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     files.forEach((file) => {
-      const key = `${file.name}-${file.size}-${file.lastModified}`
-      if (durations[key] !== undefined) return
-      const url = URL.createObjectURL(file)
-      const videoEl = document.createElement('video')
-      videoEl.preload = 'metadata'
-      videoEl.src = url
+      const key = `${file.name}-${file.size}-${file.lastModified}`;
+      if (durations[key] !== undefined) return;
+      const url = URL.createObjectURL(file);
+      const videoEl = document.createElement("video");
+      videoEl.preload = "metadata";
+      videoEl.src = url;
       videoEl.onloadedmetadata = () => {
         if (!cancelled) {
-          setDurations((prev) => ({ ...prev, [key]: videoEl.duration }))
+          setDurations((prev) => ({ ...prev, [key]: videoEl.duration }));
         }
-        URL.revokeObjectURL(url)
-      }
+        URL.revokeObjectURL(url);
+      };
       videoEl.onerror = () => {
-        if (!cancelled) setDurations((prev) => ({ ...prev, [key]: null }))
-        URL.revokeObjectURL(url)
-      }
-    })
+        if (!cancelled) setDurations((prev) => ({ ...prev, [key]: null }));
+        URL.revokeObjectURL(url);
+      };
+    });
     return () => {
-      cancelled = true
-    }
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files])
+  }, [files]);
 
-  return (file) => durations[`${file.name}-${file.size}-${file.lastModified}`]
+  return (file) => durations[`${file.name}-${file.size}-${file.lastModified}`];
 }
 
-const PIPELINE_STAGES = ['Upload', 'Extract Frames', 'Detect', 'Classify']
+const PIPELINE_STAGES = ["Upload", "Extract Frames", "Detect", "Classify"];
 
 function stageIndexForPercent(percent) {
-  if (percent >= 100) return 4
-  if (percent >= 75) return 3
-  if (percent >= 45) return 2
-  if (percent >= 15) return 1
-  return 0
+  if (percent >= 100) return 4;
+  if (percent >= 75) return 3;
+  if (percent >= 45) return 2;
+  if (percent >= 15) return 1;
+  return 0;
 }
 
 export default function UploadPanel({
@@ -75,17 +75,17 @@ export default function UploadPanel({
   isProcessing,
   progress,
 }) {
-  const [isDragOver, setDragOver] = useState(false)
-  const fileInputRef = useRef(null)
-  const getDuration = useVideoDurations(selectedFiles)
+  const [isDragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef(null);
+  const getDuration = useVideoDurations(selectedFiles);
 
   function handleFiles(fileList) {
-    const files = Array.from(fileList).slice(0, 5)
-    onFilesSelected(files)
+    const files = Array.from(fileList).slice(0, 5);
+    onFilesSelected(files);
   }
 
-  const totalQueueBytes = selectedFiles.reduce((sum, f) => sum + f.size, 0)
-  const activeStage = progress ? stageIndexForPercent(progress.percent) : -1
+  const totalQueueBytes = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+  const activeStage = progress ? stageIndexForPercent(progress.percent) : -1;
 
   return (
     <div className="flex flex-col gap-4">
@@ -94,9 +94,12 @@ export default function UploadPanel({
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-              <i className="fa-solid fa-cloud-arrow-up text-accent-blue" /> Mission Ingestion
+              <i className="fa-solid fa-cloud-arrow-up text-accent-blue" />{" "}
+              Mission Ingestion
             </h3>
-            <p className="mt-0.5 text-xs text-text-muted">Drop aerial flight video for CV analysis</p>
+            <p className="mt-0.5 text-xs text-text-muted">
+              Drop aerial flight video for CV analysis
+            </p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-accent-teal/25 bg-accent-teal/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-accent-teal">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-teal" />
@@ -105,8 +108,12 @@ export default function UploadPanel({
         </div>
 
         <div className="mb-4 flex flex-col gap-1.5">
-          <label htmlFor="selectMissionAsset" className="text-xs font-semibold text-text-secondary">
-            <i className="fa-solid fa-location-dot text-text-muted" /> Target Asset
+          <label
+            htmlFor="selectMissionAsset"
+            className="text-xs font-semibold text-text-secondary"
+          >
+            <i className="fa-solid fa-location-dot text-text-muted" /> Target
+            Asset
           </label>
           <select
             id="selectMissionAsset"
@@ -124,8 +131,12 @@ export default function UploadPanel({
         </div>
 
         <div className="mb-4 flex flex-col gap-1.5">
-          <label htmlFor="detectionModel" className="text-xs font-semibold text-text-secondary">
-            <i className="fa-solid fa-microchip text-text-muted" /> Detection model
+          <label
+            htmlFor="detectionModel"
+            className="text-xs font-semibold text-text-secondary"
+          >
+            <i className="fa-solid fa-microchip text-text-muted" /> Detection
+            model
           </label>
           <select
             id="detectionModel"
@@ -134,22 +145,33 @@ export default function UploadPanel({
             className="w-full rounded-sm border border-border bg-bg-input px-3 py-2 text-sm text-text-primary focus:border-accent-blue focus:outline-none focus:ring-2 focus:ring-accent-blue/20"
           >
             <option value="pothole">Road potholes — Hugging Face YOLO</option>
-            <option value="bridge">Bridge defects &amp; cracks — trained YOLO</option>
+            <option value="bridge">
+              Bridge defects &amp; cracks — trained YOLO
+            </option>
           </select>
           <p className="text-[11px] text-text-muted">
-            The selected model is isolated to this video job; it does not alter other inspections.
+            The selected model is isolated to this video job; it does not alter
+            other inspections.
           </p>
         </div>
 
         <div className="mb-4 rounded-sm border border-accent-teal/25 bg-accent-teal/5 p-3">
           <div className="mb-2 flex items-center justify-between gap-2">
-            <label htmlFor="liveSource" className="text-xs font-semibold text-text-secondary">
-              <i className="fa-solid fa-tower-broadcast text-accent-teal" /> Live detection source
+            <label
+              htmlFor="liveSource"
+              className="text-xs font-semibold text-text-secondary"
+            >
+              <i className="fa-solid fa-tower-broadcast text-accent-teal" />{" "}
+              Live detection source
             </label>
-            <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
-              liveStream?.status === 'running' ? 'bg-accent-teal/15 text-accent-teal' : 'bg-border text-text-muted'
-            }`}>
-              {liveStream?.status || 'idle'}
+            <span
+              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
+                liveStream?.status === "running"
+                  ? "bg-accent-teal/15 text-accent-teal"
+                  : "bg-border text-text-muted"
+              }`}
+            >
+              {liveStream?.status || "idle"}
             </span>
           </div>
           <input
@@ -169,7 +191,8 @@ export default function UploadPanel({
               <option value="pothole">Potholes only</option>
               <option value="bridge">Bridge defects only</option>
             </select>
-            {liveStream?.status === 'running' || liveStream?.status === 'queued' ? (
+            {liveStream?.status === "running" ||
+            liveStream?.status === "queued" ? (
               <button
                 type="button"
                 onClick={onStopLive}
@@ -191,9 +214,11 @@ export default function UploadPanel({
           <p className="mt-2 text-[11px] text-text-muted">
             {liveStream
               ? `${liveStream.frames_read || 0} frames captured · ${liveStream.frames_inferred || 0} analyzed · ${liveStream.detections_emitted || 0} new detections`
-              : 'Live capture keeps only the newest two frames so a slow model cannot delay the feed.'}
+              : "Live capture keeps only the newest two frames so a slow model cannot delay the feed."}
           </p>
-          {liveStream?.last_error && <p className="mt-1 text-[11px] text-p1">{liveStream.last_error}</p>}
+          {liveStream?.last_error && (
+            <p className="mt-1 text-[11px] text-p1">{liveStream.last_error}</p>
+          )}
           {liveStream?.preview_updated_at && (
             <img
               src={`${liveStream.preview_url}?t=${liveStream.preview_updated_at}`}
@@ -203,51 +228,103 @@ export default function UploadPanel({
           )}
         </div>
 
-        {/* Viewfinder dropzone: corner brackets + faint survey grid, echoing an
-            aerial capture frame rather than a generic dashed upload box. */}
+        {/* Viewfinder dropzone: aerospace sensor frame with subtle telemetry grid and high-contrast typography */}
         <div
           role="button"
           tabIndex={0}
+          aria-label="Upload drone flight video"
           onClick={() => fileInputRef.current?.click()}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click()
+            if (e.key === "Enter" || e.key === " ")
+              fileInputRef.current?.click();
           }}
           onDragOver={(e) => {
-            e.preventDefault()
-            setDragOver(true)
+            e.preventDefault();
+            setDragOver(true);
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={(e) => {
-            e.preventDefault()
-            setDragOver(false)
-            if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files)
+            e.preventDefault();
+            setDragOver(false);
+            if (e.dataTransfer.files.length > 0)
+              handleFiles(e.dataTransfer.files);
           }}
-          style={{ backgroundImage: 'url(/map-pattern.svg)', backgroundSize: '120px 120px' }}
-          className={`relative flex cursor-pointer flex-col items-center gap-1.5 rounded-md border px-4 py-9 text-center transition-colors ${
-            isDragOver ? 'border-accent-blue bg-accent-blue/5' : 'border-border bg-bg-input/60 hover:bg-bg-input'
+          className={`group relative flex cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border px-4 py-8 text-center transition-all duration-200 sm:px-6 sm:py-9 ${
+            isDragOver
+              ? "border-accent-blue bg-accent-blue/[0.08] shadow-[0_0_24px_rgba(224,122,56,0.18)]"
+              : "border-border/90 bg-[#0a0d14]/95 shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] hover:border-border-light hover:bg-[#0d111a]"
           }`}
         >
-          {/* corner reticle marks */}
+          {/* Subtle drone telemetry survey grid (dark-theme tuned with radial vignette) */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-20 transition-opacity duration-300 group-hover:opacity-35"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 163, 184, 0.12) 1px, transparent 1px)
+              `,
+              backgroundSize: "24px 24px",
+              maskImage:
+                "radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,1) 100%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,1) 100%)",
+            }}
+          />
+
+          {/* Corner viewfinder reticle marks */}
           {[
-            'left-2 top-2 border-l-2 border-t-2',
-            'right-2 top-2 border-r-2 border-t-2',
-            'left-2 bottom-2 border-l-2 border-b-2',
-            'right-2 bottom-2 border-r-2 border-b-2',
+            "left-3 top-3 border-l-2 border-t-2",
+            "right-3 top-3 border-r-2 border-t-2",
+            "left-3 bottom-3 border-l-2 border-b-2",
+            "right-3 bottom-3 border-r-2 border-b-2",
           ].map((pos) => (
             <span
               key={pos}
-              className={`pointer-events-none absolute h-4 w-4 rounded-[2px] ${pos} ${
-                isDragOver ? 'border-accent-blue' : 'border-border-light'
+              className={`pointer-events-none absolute h-3.5 w-3.5 rounded-[1px] transition-colors duration-200 ${pos} ${
+                isDragOver
+                  ? "border-accent-blue"
+                  : "border-border-light/70 group-hover:border-accent-blue/60"
               }`}
             />
           ))}
 
-          <i className="fa-solid fa-video mb-1 text-3xl text-accent-blue/70" />
-          <h4 className="text-sm font-bold text-text-primary">Drag &amp; drop drone flight video here</h4>
-          <p className="text-xs text-text-muted">MP4, MOV, AVI up to 2GB per file &middot; max 5 videos</p>
-          <span className="text-xs font-semibold text-accent-blue underline underline-offset-2">
-            or browse local files
-          </span>
+          {/* Uplink / Video focal badge */}
+          <div
+            className={`relative z-10 mb-3 flex h-12 w-12 items-center justify-center rounded-xl border transition-all duration-200 ${
+              isDragOver
+                ? "scale-105 border-accent-blue bg-accent-blue/20 text-accent-blue shadow-[0_0_16px_rgba(224,122,56,0.35)]"
+                : "border-border bg-bg-surface/90 text-accent-blue shadow-card-sm group-hover:border-accent-blue/50 group-hover:bg-[#151b27]"
+            }`}
+          >
+            <i
+              className={`fa-solid ${isDragOver ? "fa-cloud-arrow-up text-xl animate-bounce" : "fa-video text-lg"}`}
+            />
+          </div>
+
+          {/* Primary Action Title */}
+          <h4 className="relative z-10 text-[13.5px] font-bold tracking-tight text-text-primary sm:text-sm">
+            {isDragOver
+              ? "Drop drone flight video here"
+              : "Drag & drop drone flight video here"}
+          </h4>
+
+          {/* Secondary Action: Browse local files */}
+          <div className="relative z-10 mt-2 mb-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-md border border-border-light/80 bg-bg-surface/90 px-3 py-1 text-xs font-medium text-text-secondary shadow-card-sm transition-all duration-150 group-hover:border-accent-blue/60 group-hover:bg-accent-blue/10 group-hover:text-accent-blue">
+              <i className="fa-solid fa-folder-open text-[11px] text-accent-blue" />
+              Browse local files
+            </span>
+          </div>
+
+          {/* File format constraints & technical specs */}
+          <p className="relative z-10 flex flex-wrap items-center justify-center gap-x-2 text-[11px] text-text-muted">
+            <span>MP4, MOV, AVI</span>
+            <span className="text-border-light">·</span>
+            <span>Up to 2GB per file</span>
+            <span className="text-border-light">·</span>
+            <span>Max 5 videos</span>
+          </p>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -255,8 +332,8 @@ export default function UploadPanel({
             accept="video/*"
             className="hidden"
             onChange={(e) => {
-              if (e.target.files.length > 0) handleFiles(e.target.files)
-              e.target.value = ''
+              if (e.target.files.length > 0) handleFiles(e.target.files);
+              e.target.value = "";
             }}
           />
         </div>
@@ -277,7 +354,8 @@ export default function UploadPanel({
           <div className="mt-4 flex flex-col gap-3 rounded-sm border border-border bg-bg-input p-3">
             <div className="flex items-center justify-between text-xs font-medium text-text-secondary">
               <span className="flex items-center gap-1.5">
-                <i className="fa-solid fa-gear fa-spin text-accent-blue" /> {progress.label}
+                <i className="fa-solid fa-gear fa-spin text-accent-blue" />{" "}
+                {progress.label}
               </span>
               <span className="font-mono">{progress.percent}%</span>
             </div>
@@ -292,22 +370,31 @@ export default function UploadPanel({
                 frames -> detect -> classify), so ordering here is informative. */}
             <div className="flex items-center">
               {PIPELINE_STAGES.map((stage, idx) => (
-                <div key={stage} className="flex flex-1 items-center last:flex-initial">
+                <div
+                  key={stage}
+                  className="flex flex-1 items-center last:flex-initial"
+                >
                   <div className="flex items-center gap-1.5">
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
                         idx < activeStage
-                          ? 'bg-accent-blue text-white'
+                          ? "bg-accent-blue text-white"
                           : idx === activeStage
-                            ? 'bg-accent-blue/15 text-accent-blue ring-2 ring-accent-blue/30'
-                            : 'bg-border text-text-muted'
+                            ? "bg-accent-blue/15 text-accent-blue ring-2 ring-accent-blue/30"
+                            : "bg-border text-text-muted"
                       }`}
                     >
-                      {idx < activeStage ? <i className="fa-solid fa-check text-[9px]" /> : idx + 1}
+                      {idx < activeStage ? (
+                        <i className="fa-solid fa-check text-[9px]" />
+                      ) : (
+                        idx + 1
+                      )}
                     </span>
                     <span
                       className={`whitespace-nowrap text-[11px] font-semibold ${
-                        idx <= activeStage ? 'text-text-primary' : 'text-text-muted'
+                        idx <= activeStage
+                          ? "text-text-primary"
+                          : "text-text-muted"
                       }`}
                     >
                       {stage}
@@ -315,7 +402,7 @@ export default function UploadPanel({
                   </div>
                   {idx < PIPELINE_STAGES.length - 1 && (
                     <div
-                      className={`mx-2 h-px flex-1 ${idx < activeStage ? 'bg-accent-blue' : 'bg-border'}`}
+                      className={`mx-2 h-px flex-1 ${idx < activeStage ? "bg-accent-blue" : "bg-border"}`}
                     />
                   )}
                 </div>
@@ -330,7 +417,11 @@ export default function UploadPanel({
           disabled={selectedFiles.length === 0 || isProcessing}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-accent-blue px-4 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-accent-blue-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isProcessing ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-bolt" />}
+          {isProcessing ? (
+            <i className="fa-solid fa-spinner fa-spin" />
+          ) : (
+            <i className="fa-solid fa-bolt" />
+          )}
           Run Computer Vision Inspection
         </button>
       </div>
@@ -339,7 +430,8 @@ export default function UploadPanel({
       <div className="rounded-md border border-border bg-bg-card p-5 shadow-card-sm">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="flex items-center gap-2 text-[15px] font-bold text-text-primary">
-            <i className="fa-solid fa-list-check text-accent-blue" /> Video Manifest
+            <i className="fa-solid fa-list-check text-accent-blue" /> Video
+            Manifest
           </h3>
           <span className="rounded-full bg-border px-2.5 py-1 font-mono text-[11px] font-bold text-text-secondary">
             {selectedFiles.length} queued
@@ -349,7 +441,9 @@ export default function UploadPanel({
         {selectedFiles.length === 0 ? (
           <div className="flex flex-col items-center gap-2 py-8 text-center text-text-muted">
             <i className="fa-solid fa-video text-2xl opacity-50" />
-            <p className="text-xs">No video files queued. Upload footage or load a sample mission.</p>
+            <p className="text-xs">
+              No video files queued. Upload footage or load a sample mission.
+            </p>
           </div>
         ) : (
           <>
@@ -360,10 +454,12 @@ export default function UploadPanel({
                   className="flex items-center gap-2.5 rounded-sm bg-bg-input px-3 py-2 text-xs"
                 >
                   <span className="w-5 shrink-0 text-right font-mono text-[10px] text-text-muted">
-                    {String(idx + 1).padStart(2, '0')}
+                    {String(idx + 1).padStart(2, "0")}
                   </span>
                   <i className="fa-solid fa-file-video shrink-0 text-accent-blue" />
-                  <span className="min-w-0 flex-1 truncate font-medium text-text-primary">{file.name}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium text-text-primary">
+                    {file.name}
+                  </span>
                   <span className="shrink-0 font-mono text-[11px] text-text-muted">
                     {formatDuration(getDuration(file))}
                   </span>
@@ -383,5 +479,5 @@ export default function UploadPanel({
         )}
       </div>
     </div>
-  )
+  );
 }
