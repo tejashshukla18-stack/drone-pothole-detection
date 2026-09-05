@@ -49,7 +49,10 @@ async function ensureVisionService() {
   }
   return visionStartPromise;
 }
-const runtimeDirectory = path.join(__dirname, 'runtime');
+// Keep runtime evidence outside a restricted/project-controlled directory on
+// Windows. The Python sidecar receives the same location from start.ps1.
+const runtimeDirectory = process.env.CV_RUNTIME_DIR
+  || path.join(process.env.TEMP || process.env.TMP || __dirname, 'AeroPatch-runtime');
 const videoUploadDirectory = path.join(runtimeDirectory, 'video-uploads');
 mkdirSync(videoUploadDirectory, { recursive: true });
 const videoUpload = multer({
