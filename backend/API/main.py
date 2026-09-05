@@ -25,6 +25,8 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 
 MODEL_PATH = Path(os.getenv("BRIDGE_MODEL_PATH", Path(__file__).parent / "models" / "bridge-defect-yolo26m.pt"))
+BRIDGE_MODEL_REPO = os.getenv("BRIDGE_MODEL_REPO", "").strip()
+BRIDGE_MODEL_FILENAME = os.getenv("BRIDGE_MODEL_FILENAME", "bridge-defect-yolo26m.pt")
 POTHOLE_MODEL_PATH = Path(os.getenv("POTHOLE_MODEL_PATH", Path(__file__).parent / "models" / "pothole-rdd-v1.pt"))
 DEVICE = os.getenv("BRIDGE_MODEL_DEVICE", "cpu")
 DEFAULT_CONFIDENCE = float(os.getenv("BRIDGE_MODEL_CONFIDENCE", "0.45"))
@@ -66,13 +68,16 @@ class VisionModels:
         self.pothole_lock = threading.Lock()
 
     def load(self) -> None:
-        if not MODEL_PATH.is_file():
-            self.bridge_error = f"Bridge model not found: {MODEL_PATH}"
-            return
         try:
+            model_path = MODEL_PATH
+            if not model_path.is_file() and BRIDGE_MODEL_REPO:
+                from huggingface_hub import hf_hub_download
+                model_path = Path(hf_hub_download(repo_id=BRIDGE_MODEL_REPO, filename=BRIDGE_MODEL_FILENAME))
+            if not model_path.is_file():
+                location = f"or set BRIDGE_MODEL_REPO and BRIDGE_MODEL_FILENAME" if not BRIDGE_MODEL_REPO else ""
+                raise FileNotFoundError(f"Bridge model not found: {MODEL_PATH} {location}".strip())
             from ultralytics import YOLO
-
-            self.bridge_model = YOLO(str(MODEL_PATH))
+            self.bridge_model = YOLO(str(model_path))
             # Class labels are stored in the trained checkpoint; retain this explicit
             # mapping as a compatible fallback for results serialized by Ultralytics.
             self.bridge_error = None

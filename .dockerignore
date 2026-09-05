@@ -1,0 +1,11 @@
+node_modules
+frontend-react/node_modules
+frontend-react/dist
+frontend-react/dist-*
+runtime
+.git
+.venv
+dataset
+training
+*.zip
+*.mp4

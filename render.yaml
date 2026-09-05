@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: aeropatch-ai
+    runtime: docker
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: AUTO_START_VISION
+        value: "false"
+      - key: CV_RUNTIME_DIR
+        value: /tmp/aeropatch-runtime
+      - key: BRIDGE_MODEL_REPO
+        sync: false
+      - key: BRIDGE_MODEL_FILENAME
+        value: bridge-defect-yolo26m.pt
+      - key: HF_TOKEN
+        sync: false
