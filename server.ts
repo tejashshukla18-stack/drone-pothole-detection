@@ -13,6 +13,24 @@ const __dirname = process.env.PROJECT_ROOT || process.cwd();
 
 const app = express();
 const upload = multer({ storage: multer.memoryStorage() });
+// A separately deployed Vite frontend calls this API from a different origin.
+// Set POTHOLE_CORS_ORIGINS to a comma-separated allow-list in production.
+const corsOrigins = (process.env.POTHOLE_CORS_ORIGINS || '*')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const originAllowed = Boolean(origin) && (corsOrigins.includes('*') || corsOrigins.includes(origin));
+  if (originAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', corsOrigins.includes('*') ? '*' : origin!);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 const bridgeCvUrl = (process.env.BRIDGE_CV_API_URL || 'http://127.0.0.1:8001').replace(/\/$/, '');
 const visionStartScript = path.join(__dirname, 'backend', 'API', 'start.ps1');
 let visionStartPromise: Promise<boolean> | null = null;
