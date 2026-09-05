@@ -3,7 +3,6 @@ import AppLayout from './components/layout/AppLayout.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Infrastructure from './pages/Infrastructure.jsx'
 import Inspections from './pages/Inspections.jsx'
-import LandIntelligence from './pages/LandIntelligence.jsx'
 import CommandCentre from './pages/CommandCentre.jsx'
 import IssueEscalation from './pages/IssueEscalation.jsx'
 import Reports from './pages/Reports.jsx'
@@ -17,7 +16,6 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/infrastructure" element={<Infrastructure />} />
         <Route path="/inspections" element={<Inspections />} />
-        <Route path="/land-intelligence" element={<LandIntelligence />} />
         <Route path="/command-centre/*" element={<CommandCentre />} />
         <Route path="/issue-escalation" element={<IssueEscalation />} />
         <Route path="/reports" element={<Reports />} />
