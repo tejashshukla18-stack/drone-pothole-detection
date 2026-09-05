@@ -9,7 +9,8 @@ import ToastViewport from './components/ui/Toast.jsx'
 // On Render the UI is a Static Site and the API lives on a separate Web
 // Service. Keep local development unchanged, but redirect all existing
 // relative `/api/...` requests to the configured public backend.
-const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '')
+const apiUrl = (import.meta.env.VITE_API_URL || 'https://drone-pothole-detection-back.onrender.com')
+  .replace(/\/+$/, '')
 if (apiUrl) {
   const nativeFetch = window.fetch.bind(window)
   window.fetch = (input, init) => {
