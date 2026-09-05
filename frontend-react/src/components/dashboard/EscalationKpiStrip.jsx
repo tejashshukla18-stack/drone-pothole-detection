@@ -12,17 +12,23 @@ export default function EscalationKpiStrip({ kpis }) {
   return (
     <Link
       to="/issue-escalation"
-      className="mb-4.5 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border border-border bg-bg-card px-4 py-3 shadow-card-sm transition-colors hover:bg-bg-card-hover"
+      className="mb-4.5 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border border-border bg-bg-card px-4 py-2.5 shadow-card-sm transition-all duration-150 hover:border-border-light hover:bg-bg-card-hover"
     >
-      <span className="flex items-center gap-1.5 text-[12px] font-bold text-text-primary">
-        <i className="fa-solid fa-file-shield text-accent-blue" /> Issue Escalation
+      <span className="flex items-center gap-2 text-[12px] font-bold text-text-primary">
+        <i className="fa-solid fa-file-shield text-accent-blue" />
+        <span className="uppercase tracking-wider">Issue Escalation</span>
       </span>
       {items.map((item) => (
         <span key={item.label} className="flex items-center gap-1.5 text-[12px] text-text-secondary">
-          <i className={`fa-solid ${item.icon} ${item.tone}`} />
-          <strong className={`text-[13px] ${item.tone}`}>{item.value}</strong> {item.label}
+          <i className={`fa-solid ${item.icon} text-[11px] ${item.tone}`} />
+          <strong className={`font-mono text-[13px] font-bold ${item.tone}`}>{item.value}</strong>
+          <span className="text-slate-400">{item.label}</span>
         </span>
       ))}
+      <span className="ml-auto hidden items-center gap-1 font-mono text-[10.5px] font-semibold text-accent-blue sm:flex">
+        <span>VIEW TICKETS</span>
+        <i className="fa-solid fa-chevron-right text-[9px]" />
+      </span>
     </Link>
   )
 }

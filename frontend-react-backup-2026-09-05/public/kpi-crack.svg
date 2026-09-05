@@ -1,0 +1,24 @@
+<svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Isometric slab -->
+  <polygon points="100,20 180,55 100,90 20,55" fill="#cbd5e1" />
+  <polygon points="20,55 100,90 100,120 20,85" fill="#94a3b8" />
+  <polygon points="180,55 100,90 100,120 180,85" fill="#b0b9c6" />
+
+  <!-- Tile seams -->
+  <g stroke="#9aa5b3" stroke-width="1.2" opacity="0.7">
+    <line x1="60" y1="37" x2="60" y2="105" />
+    <line x1="140" y1="37" x2="140" y2="105" />
+    <line x1="30" y1="60" x2="150" y2="24" />
+    <line x1="50" y1="76" x2="170" y2="40" />
+  </g>
+
+  <!-- Red highlighted crack zone -->
+  <polygon points="78,48 128,48 138,72 118,92 78,88 66,66" fill="#fecaca" opacity="0.85" />
+
+  <!-- Crack lines -->
+  <g stroke="#7c2d2d" stroke-width="2" fill="none" stroke-linecap="round">
+    <path d="M82 52 L96 60 L90 70 L104 76 L98 86 L112 90" />
+    <path d="M96 60 L92 50" />
+    <path d="M104 76 L110 84" />
+  </g>
+</svg>

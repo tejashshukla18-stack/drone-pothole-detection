@@ -43,5 +43,45 @@ export default function DashboardMap({ assets, alertRadiusM = 200 }) {
   useEffect(() => { const map = mapRef.current; if (!map) return; assetLayersRef.current.forEach((layer) => layer.remove()); assetLayersRef.current = []; const points = (assets || []).map((asset) => ({ asset, point: frameCoordinates(asset) })).filter(({ point }) => point); points.forEach(({ asset, point }) => { const color = healthScoreToColor(asset.health_score ?? 100); assetLayersRef.current.push(L.circleMarker([point.lat, point.lng], { radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: .85 }).addTo(map).bindPopup(`<strong>${asset.name}</strong><br>Health: ${asset.health_score ?? '—'}/100`)) }); setWarning(points.some(({ point }) => NO_FLY_ZONES.some((zone) => distance(point, zone) <= zone.radius + alertRadiusM)) ? `⚠️ RESTRICTED AIRSPACE: NO-FLY ZONE BREACH DETECTED — vehicle is within ${alertRadiusM}m of a restricted zone.` : '') }, [assets, alertRadiusM])
   useEffect(() => { const map = mapRef.current, zones = nfzRef.current; if (map && zones) zonesVisible ? zones.addTo(map) : map.removeLayer(zones) }, [zonesVisible])
   useEffect(() => { let cancelled = false; async function render() { try { const mission = (await fetchMissions()).at(-1), frames = Array.isArray(mission?.images) ? mission.images : []; if (!frames.length) return setMessage('No usable location data for this mission — it has no analyzed frames yet.'); const real = frames.map(frameCoordinates), estimated = await estimatePositions(frames.length), plotted = frames.map((frame, i) => ({ frame, point: real[i] || estimated[i] })).filter(({ point }) => point); if (!plotted.length || cancelled) return setMessage('No usable location data for this mission.'); setMessage(real.some(Boolean) ? '' : 'Frame locations are estimated from a road route; no frame GPS was supplied.'); if (timerRef.current) clearInterval(timerRef.current); missionLayersRef.current.forEach((layer) => layer.remove()); missionLayersRef.current = []; let i = 0, prior = null, priorSeverity = 'Low'; timerRef.current = setInterval(() => { if (i >= plotted.length) { clearInterval(timerRef.current); mapRef.current?.fitBounds(plotted.map(({ point }) => [point.lat, point.lng]), { padding: [40, 40] }); return } const { frame, point } = plotted[i], severity = frame.metrics?.severity || frame.severity || 'Low', color = severityToColor(severity), marker = L.circleMarker([point.lat, point.lng], { radius: 7, color, fillColor: color, fillOpacity: .9, weight: 2 }).addTo(mapRef.current).bindPopup(`<strong>Frame ${frame.frame_index ?? i + 1}</strong><br>Severity: ${severity}<br>${point.estimated ? '<b>Estimated position</b>' : 'Verified frame telemetry'}`); missionLayersRef.current.push(marker); const ranks = { Low: 1, Medium: 2, High: 3, 'P1 Critical': 4 }; if (prior) missionLayersRef.current.push(L.polyline([[prior.lat, prior.lng], [point.lat, point.lng]], { color: severityToColor((ranks[severity] || 1) >= (ranks[priorSeverity] || 1) ? severity : priorSeverity), weight: 4, opacity: .75 }).addTo(mapRef.current)); prior = point; priorSeverity = severity; i += 1 }, 250) } catch { if (!cancelled) setMessage('No usable location data for this mission.') } } render(); return () => { cancelled = true; if (timerRef.current) clearInterval(timerRef.current) } }, [])
-  return <div className="relative"><div className="absolute right-3 top-3 z-[500]"><button type="button" onClick={() => setZonesVisible((value) => !value)} className="rounded-sm border border-border bg-bg-card px-3 py-2 text-xs font-semibold shadow-card-sm"><i className="fa-solid fa-ban mr-1.5 text-p1" />{zonesVisible ? 'Hide' : 'Show'} No-Fly Zones</button></div>{warning && <div className="absolute bottom-3 left-3 right-3 z-[500] animate-pulse rounded-sm border border-p1 bg-p1 px-3 py-2 text-center text-xs font-extrabold text-white">{warning}</div>}{message && <div className="absolute bottom-3 left-3 z-[500] rounded-sm border border-p2 bg-bg-card px-3 py-2 text-xs font-semibold text-text-secondary shadow-card-sm">{message}</div>}<div ref={containerRef} className="h-[460px] w-full rounded-sm border border-border bg-slate-900" /></div>
+  return (
+    <div className="relative overflow-hidden rounded-sm border border-border bg-[#090c10]">
+      {/* Tactical HUD Header Bar */}
+      <div className="absolute left-3 top-3 z-[500] flex items-center gap-2">
+        <div className="hidden items-center gap-2 rounded border border-border/80 bg-[#0e121a]/90 px-2.5 py-1.5 font-mono text-[10.5px] text-slate-300 shadow-card-sm backdrop-blur-sm sm:flex">
+          <span className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent-blue" />
+            <span className="text-text-muted">CTR:</span> 37.77°N, 122.41°W
+          </span>
+          <span className="text-slate-600">|</span>
+          <span className="text-text-muted">ALT:</span> 45m AGL
+        </div>
+      </div>
+
+      <div className="absolute right-3 top-3 z-[500]">
+        <button
+          type="button"
+          onClick={() => setZonesVisible((value) => !value)}
+          className="inline-flex items-center gap-1.5 rounded-sm border border-border bg-[#0e121a]/90 px-3 py-1.5 text-xs font-semibold text-slate-200 shadow-card-sm backdrop-blur-sm transition-colors hover:border-border-light hover:bg-[#151a24] hover:text-white"
+        >
+          <i className="fa-solid fa-ban text-p1" />
+          {zonesVisible ? 'Hide' : 'Show'} No-Fly Zones
+        </button>
+      </div>
+
+      {warning && (
+        <div className="absolute bottom-3 left-3 right-3 z-[500] animate-pulse rounded-sm border border-p1/60 bg-p1/90 px-3 py-2 text-center text-xs font-extrabold text-white shadow-card-md backdrop-blur-sm">
+          {warning}
+        </div>
+      )}
+
+      {message && (
+        <div className="absolute bottom-3 left-3 z-[500] rounded-sm border border-border/80 bg-[#0e121a]/90 px-3 py-1.5 font-mono text-[11px] font-medium text-slate-300 shadow-card-sm backdrop-blur-sm">
+          <i className="fa-solid fa-circle-info mr-1.5 text-accent-blue" />
+          {message}
+        </div>
+      )}
+
+      <div ref={containerRef} className="h-[460px] w-full bg-[#090c10]" />
+    </div>
+  )
 }

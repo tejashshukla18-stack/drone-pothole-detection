@@ -1,0 +1,36 @@
+<svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Small drone, upper area -->
+  <g transform="translate(20,14) scale(0.62)" stroke="#64748b" stroke-width="2.6" stroke-linecap="round" fill="none">
+    <line x1="55" y1="55" x2="20" y2="30" />
+    <line x1="55" y1="55" x2="20" y2="80" />
+    <line x1="85" y1="55" x2="120" y2="30" />
+    <line x1="85" y1="55" x2="120" y2="80" />
+    <ellipse cx="16" cy="24" rx="15" ry="3" fill="#cbd5e1" stroke="none" />
+    <ellipse cx="16" cy="86" rx="15" ry="3" fill="#cbd5e1" stroke="none" />
+    <ellipse cx="124" cy="24" rx="15" ry="3" fill="#cbd5e1" stroke="none" />
+    <ellipse cx="124" cy="86" rx="15" ry="3" fill="#cbd5e1" stroke="none" />
+    <rect x="48" y="46" width="44" height="20" rx="7" fill="#e2e8f0" stroke="none" />
+  </g>
+
+  <!-- Heart -->
+  <path
+    d="M138 118
+       C 100 92, 96 60, 120 46
+       C 134 38, 148 44, 152 58
+       C 156 44, 170 38, 184 46
+       C 208 60, 204 92, 166 118
+       Z"
+    fill="#ef4444"
+    opacity="0.92"
+  />
+
+  <!-- EKG pulse line across the heart -->
+  <polyline
+    points="104,84 128,84 136,66 146,100 156,76 164,84 200,84"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

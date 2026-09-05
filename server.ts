@@ -251,6 +251,10 @@ const operationalSettings = {
   min_defect_area_sqcm: 85,
   auto_ticket_escalation: 'high_only',
   nfz_alert_radius_m: 200,
+  auto_escalation_enabled: true,
+  critical_issue_auto_ticket: true,
+  default_sla_hours: 24,
+  notification_channels: ['In-App Notification'],
 };
 const reportsDB: any[] = [];
 const workOrdersDB: any[] = [];
@@ -830,7 +834,7 @@ app.post('/api/maintenance', (req, res) => {
   return res.status(201).json({ work_order: workOrder });
 });
 
-app.get('/api/settings', (_req, res) => res.json({ settings: operationalSettings, users: [] }));
+app.get('/api/settings', (_req, res) => res.json({ settings: operationalSettings, escalation_settings: operationalSettings, users: [] }));
 
 app.post('/api/settings', (req, res) => {
   const payload = req.body || {};
@@ -847,6 +851,20 @@ app.post('/api/settings', (req, res) => {
     nfz_alert_radius_m: numberInRange(payload.nfz_alert_radius_m, operationalSettings.nfz_alert_radius_m, 100, 1000),
   });
   return res.json({ settings: operationalSettings });
+});
+
+app.post('/api/settings/escalation', (req, res) => {
+  const payload = req.body || {};
+  Object.assign(operationalSettings, {
+    auto_escalation_enabled: Boolean(payload.auto_escalation_enabled),
+    critical_issue_auto_ticket: Boolean(payload.critical_issue_auto_ticket),
+    default_sla_hours: numberInRange(payload.default_sla_hours, operationalSettings.default_sla_hours, 1, 720),
+    notification_channels: Array.isArray(payload.notification_channels)
+      ? payload.notification_channels.filter((item: unknown) => typeof item === 'string').slice(0, 4)
+      : operationalSettings.notification_channels,
+  });
+  operationalSettings.auto_ticket_escalation = operationalSettings.critical_issue_auto_ticket ? 'high_only' : 'manual_only';
+  return res.json({ escalation_settings: operationalSettings });
 });
 
 app.get('/api/notifications', (_req, res) => res.json({ notifications: notificationsDB }));

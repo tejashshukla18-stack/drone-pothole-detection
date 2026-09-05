@@ -1,0 +1,76 @@
+// Single source of truth for the sidebar navigation and the top header's
+// per-route title/subtitle. Keeping this in one place means Sidebar.jsx and
+// TopHeader.jsx never fall out of sync.
+
+export const NAV_ITEMS = [
+  {
+    path: '/dashboard',
+    label: 'Dashboard',
+    icon: 'fa-solid fa-chart-pie',
+    title: 'Executive Overview',
+    subtitle:
+      'Real-time civil asset health monitoring and autonomous drone defect triage',
+  },
+  {
+    path: '/infrastructure',
+    label: 'Infrastructure',
+    icon: 'fa-solid fa-road-barrier',
+    badge: { text: '5', tone: 'default' },
+    title: 'Municipal Infrastructure Assets',
+    subtitle:
+      'Manage roads, bridges, and municipal surfaces with AI condition ratings',
+  },
+  {
+    path: '/inspections',
+    label: 'Inspections',
+    icon: 'fa-solid fa-satellite-dish',
+    badge: { text: '3', tone: 'alert' },
+    title: 'Drone Flight Missions & Ingestion',
+    subtitle:
+      'Upload high-resolution aerial imagery and execute computer vision detection',
+  },
+  {
+    path: '/land-intelligence',
+    label: 'Land Intelligence',
+    icon: 'fa-solid fa-draw-polygon',
+    badge: { text: 'NEW', tone: 'default' },
+    title: 'Land Encroachment Intelligence',
+    subtitle:
+      'AI-powered parcel boundary analysis, structure detection and encroachment risk assessment',
+  },
+  {
+    path: '/command-centre',
+    label: 'Command Centre',
+    icon: 'fa-solid fa-satellite',
+    badge: { text: 'V2 ACTIVE', tone: 'pulse' },
+    title: 'Command Centre',
+    subtitle:
+      'Unified mission control for fleet status, AI review, and work order dispatch',
+  },
+  {
+    path: '/issue-escalation',
+    label: 'Issue Escalation',
+    icon: 'fa-solid fa-file-shield',
+    title: 'Automatic Issue Escalation',
+    subtitle:
+      'Critical detections routed and ticketed automatically to the responsible authority',
+  },
+  {
+    path: '/reports',
+    label: 'Reports',
+    icon: 'fa-solid fa-file-pdf',
+    title: 'Municipal Pavement Inspection Reports',
+    subtitle: 'Certified civil engineering dossiers and compliance documentation',
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: 'fa-solid fa-gear',
+    title: 'System Settings',
+    subtitle: 'Department credentials, AI sensitivity, and authorized user access',
+  },
+]
+
+export function getNavItemByPath(pathname) {
+  return NAV_ITEMS.find((item) => pathname.startsWith(item.path))
+}

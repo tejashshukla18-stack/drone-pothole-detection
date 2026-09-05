@@ -2,56 +2,59 @@
 @import "@fortawesome/fontawesome-free/css/all.min.css";
 
 @theme {
-  /* Surfaces */
-  --color-bg-base: #f8fafc;
-  --color-bg-surface: #ffffff;
-  --color-bg-card: #ffffff;
-  --color-bg-card-hover: #f1f5f9;
-  --color-bg-input: #f8fafc;
+  /* Surfaces — Deep Command Black & Dark Graphite */
+  --color-bg-base: #090b0e;
+  --color-bg-surface: #0e121a;
+  --color-bg-card: #131824;
+  --color-bg-card-hover: #19202f;
+  --color-bg-input: #0a0d14;
 
-  /* Borders */
-  --color-border: #e2e8f0;
-  --color-border-light: #cbd5e1;
+  /* Borders — Subtle Technical Graphite */
+  --color-border: #1e2637;
+  --color-border-light: #28334a;
 
-  /* Text */
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
+  /* Text — Off-White, Slate & Technical Muted */
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #5e6c84;
 
-  /* Severity */
-  --color-p1: #ef4444;
-  --color-p2: #f59e0b;
-  --color-p3: #10b981;
+  /* Severity Indicators */
+  --color-p1: #ef4444;       /* P1 Critical / High */
+  --color-p2: #f59e0b;       /* P2 Scheduled / Medium */
+  --color-p3: #10b981;       /* P3 Routine / Low */
 
-  /* Accents */
-  --color-accent-blue: #0284c7;
-  --color-accent-blue-hover: #0369a1;
+  /* Subtle Muted Copper / Warm Amber Accent (Spare & Purposeful) */
+  --color-accent-blue: #e07a38;
+  --color-accent-blue-hover: #c86526;
+  --color-accent-amber: #f59e0b;
+  --color-accent-copper: #e07a38;
   --color-accent-teal: #0d9488;
   --color-accent-indigo: #4f46e5;
 
-  /* Sidebar (dark) */
-  --color-sidebar-bg: #12161f;
-  --color-sidebar-bg-hover: #1b202c;
+  /* Sidebar (Dark Aerospace Command Center) */
+  --color-sidebar-bg: #0d1015;
+  --color-sidebar-bg-hover: #151a24;
   --color-sidebar-border: #232838;
   --color-sidebar-text: #e2e8f0;
-  --color-sidebar-text-muted: #6b7280;
-  --color-sidebar-active-bg: #1c2534;
+  --color-sidebar-text-muted: #64748b;
+  --color-sidebar-active-bg: rgba(224, 122, 56, 0.12);
 
-  /* Dark ink buttons (e.g. "+ New Inspection", quick actions) */
-  --color-ink: #0f172a;
-  --color-ink-hover: #1e293b;
+  /* Dark Command Action Buttons */
+  --color-ink: #161c29;
+  --color-ink-hover: #1f2738;
 
-  /* Radius */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* Radius — Minimal Engineered Radii */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 
-  /* Shadows */
-  --shadow-card-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-card-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-card-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+  /* Soft Ambient Command Shadows */
+  --shadow-card-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-card-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-card-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 * {
@@ -70,6 +73,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
 
 @keyframes pulse-badge {
   0% {
@@ -102,21 +109,131 @@ body {
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.2s ease-in-out;
+  animation: fade-in-up 0.18s ease-out;
 }
 
-/* Thin, unobtrusive scrollbars to match the polished reference UI */
+@keyframes beacon-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(224, 122, 56, 0.6);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(224, 122, 56, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(224, 122, 56, 0);
+  }
+}
+
+.beacon-pulse {
+  animation: beacon-pulse 2.2s infinite;
+}
+
+/* ==========================================================================
+   Telemetry & Aerospace Technical Utilities
+   ========================================================================== */
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.bg-tech-grid {
+  background-image: radial-gradient(rgba(224, 122, 56, 0.07) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.bg-tech-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+
+/* ==========================================================================
+   Leaflet Map Dark Theme Overrides
+   ========================================================================== */
+
+.leaflet-container {
+  background: #090c10 !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #131824 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #1e2637 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+  border-radius: 6px !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.5 !important;
+  font-size: 12.5px !important;
+}
+
+.leaflet-popup-content strong {
+  color: #e07a38 !important;
+}
+
+.leaflet-tooltip {
+  background: #0e121a !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #28334a !important;
+  font-size: 11.5px !important;
+  font-weight: 600 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-control-zoom a {
+  background: #131824 !important;
+  color: #f1f5f9 !important;
+  border-color: #1e2637 !important;
+  border-radius: 4px !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #19202f !important;
+  color: #e07a38 !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(14, 18, 26, 0.85) !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #94a3b8 !important;
+}
+
+/* ==========================================================================
+   Scrollbars — Dark Command Center
+   ========================================================================== */
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-light) transparent;
+  scrollbar-color: #28334a transparent;
 }
 
 *::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--color-border-light);
+  background-color: #28334a;
   border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #3b475e;
 }

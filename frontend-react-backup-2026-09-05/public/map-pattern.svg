@@ -1,0 +1,15 @@
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+  <rect width="240" height="240" fill="none" />
+  <g stroke="#cbd5e1" stroke-width="2">
+    <path d="M0 40 H240" />
+    <path d="M0 130 H240" />
+    <path d="M40 0 V240" />
+    <path d="M170 0 V240" />
+  </g>
+  <g fill="#d6dde6">
+    <rect x="60" y="60" width="40" height="30" rx="2" />
+    <rect x="185" y="45" width="34" height="46" rx="2" />
+    <rect x="20" y="160" width="46" height="30" rx="2" />
+    <rect x="100" y="150" width="30" height="60" rx="2" />
+  </g>
+</svg>

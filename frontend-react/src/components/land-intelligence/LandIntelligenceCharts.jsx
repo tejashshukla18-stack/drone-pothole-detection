@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import Chart from 'chart.js/auto'
 
-const GRID_COLOR = '#e2e8f0'
-const TICK_COLOR = '#64748b'
+const GRID_COLOR = 'rgba(255, 255, 255, 0.07)'
+const TICK_COLOR = '#94a3b8'
 
 // Shared hook: creates a Chart.js instance once, destroys it on unmount or
 // when config changes to avoid duplicate/leaked instances across re-renders.
@@ -41,7 +41,7 @@ export function RiskDistributionChart({ riskDistribution }) {
           {
             data: riskDistribution.map((r) => r.value),
             backgroundColor: riskDistribution.map((r) => r.color),
-            borderColor: '#ffffff',
+            borderColor: '#131824',
             borderWidth: 2,
           },
         ],

@@ -34,22 +34,22 @@ export default function RecentActivity({ activities }) {
         return (
           <div
             key={act.id}
-            className={`flex gap-3 rounded-sm border-l-[3px] bg-bg-surface p-3 ${borderClass}`}
+            className={`flex items-start gap-3 rounded-sm border border-border/70 border-l-[3px] bg-[#0e121a] p-3 shadow-card-sm transition-colors duration-150 hover:border-border-light hover:bg-[#131824] ${borderClass}`}
           >
-            <div className="mt-0.5 text-[15px] text-text-secondary">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-border bg-[#161c28] text-[12px] text-accent-blue">
               <i className={`fa-solid ${TYPE_ICONS[act.type] || 'fa-file-signature'}`} />
             </div>
             <div className="min-w-0 flex-1">
               <h4 className="truncate text-[13px] font-semibold text-text-primary">{act.title}</h4>
-              <p className="my-0.5 truncate text-xs text-text-muted">
-                <i className="fa-solid fa-map-pin" /> {act.asset}
+              <p className="my-0.5 flex items-center gap-1.5 truncate font-mono text-[11px] text-text-muted">
+                <i className="fa-solid fa-map-pin text-accent-blue text-[10px]" /> {act.asset}
               </p>
-              <div className="flex flex-wrap gap-3 text-[11px] text-text-secondary">
-                <span>
-                  <i className="fa-solid fa-user" /> {act.user}
+              <div className="mt-1.5 flex flex-wrap items-center gap-3 text-[11px] text-text-secondary">
+                <span className="flex items-center gap-1 text-slate-400">
+                  <i className="fa-solid fa-user-shield text-[10px] text-slate-500" /> {act.user}
                 </span>
-                <span>
-                  <i className="fa-regular fa-clock" /> {act.time}
+                <span className="flex items-center gap-1 font-mono text-[10.5px] text-slate-400">
+                  <i className="fa-regular fa-clock text-[10px] text-slate-500" /> {act.time}
                 </span>
               </div>
             </div>

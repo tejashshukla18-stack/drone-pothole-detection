@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import Chart from 'chart.js/auto'
 
-const GRID_COLOR = '#e2e8f0'
-const TICK_COLOR = '#64748b'
+const GRID_COLOR = 'rgba(255, 255, 255, 0.07)'
+const TICK_COLOR = '#94a3b8'
 
 // Shared hook: creates a Chart.js instance once, destroys it on unmount or
 // when config changes to avoid duplicate/leaked instances across re-renders.
@@ -47,7 +47,7 @@ export function SeverityDoughnutChart({ severityDistribution }) {
           {
             data: hasData ? sevData : [0, 0, 0],
             backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-            borderColor: '#ffffff',
+            borderColor: '#131824',
             borderWidth: 2,
           },
         ],
@@ -130,7 +130,7 @@ export function AssetHealthBarChart({ assetTypeDistribution }) {
               assetTypeDistribution.buildings || 0,
               assetTypeDistribution.municipal_surfaces || 0,
             ],
-            backgroundColor: ['#0ea5e9', '#6366f1', '#f59e0b', '#10b981'],
+            backgroundColor: ['#e07a38', '#38bdf8', '#f59e0b', '#10b981'],
           },
         ],
       },

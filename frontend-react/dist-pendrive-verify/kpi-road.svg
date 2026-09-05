@@ -1,0 +1,33 @@
+<svg width="200" height="140" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ground -->
+  <polygon points="10,90 100,50 200,90 110,130" fill="#dbeafe" opacity="0.35" />
+  <!-- Grass strip -->
+  <polygon points="10,90 60,70 90,82 40,102" fill="#86c68a" />
+  <polygon points="110,58 140,46 200,68 168,82" fill="#86c68a" />
+  <!-- Road -->
+  <polygon points="60,70 90,82 40,102 10,90" fill="#5b6472" opacity="0" />
+  <polygon points="90,82 140,60 200,80 150,104" fill="#4b5563" />
+  <!-- Lane dashes -->
+  <g stroke="#e5e7eb" stroke-width="3" stroke-dasharray="8 7">
+    <line x1="105" y1="80" x2="185" y2="82" />
+  </g>
+  <!-- Car -->
+  <g transform="translate(112,84)">
+    <rect x="0" y="6" width="34" height="14" rx="4" fill="#0f172a" />
+    <rect x="6" y="-2" width="20" height="12" rx="3" fill="#334155" />
+    <circle cx="7" cy="21" r="4" fill="#111827" />
+    <circle cx="27" cy="21" r="4" fill="#111827" />
+  </g>
+  <!-- Gantry sign -->
+  <g stroke="#94a3b8" stroke-width="3" fill="none">
+    <line x1="150" y1="20" x2="150" y2="66" />
+    <line x1="150" y1="20" x2="196" y2="30" />
+  </g>
+  <rect x="158" y="18" width="30" height="16" rx="2" fill="#22c55e" />
+  <!-- WiFi / signal arcs -->
+  <g stroke="#38bdf8" stroke-width="2.5" fill="none" stroke-linecap="round">
+    <path d="M64 66 a10 10 0 0 1 14 0" />
+    <path d="M60 71 a17 17 0 0 1 22 0" />
+  </g>
+  <circle cx="71" cy="72" r="2.5" fill="#0284c7" />
+</svg>
